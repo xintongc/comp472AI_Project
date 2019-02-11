@@ -8,9 +8,12 @@ class Game:
         self.counter = 0
         self.board = np.empty((12, 8), Card) #initial state
 
-        self.current_turn_win = False; #flag for win for current player
-        self.current_makes_illegal = False; #flag for whether current player makes the state illegal
-        self.other_could_win = False; # flag for checking if the card current player played will make the other win
+        self.current_turn_win = False #flag for win for current player
+        self.current_makes_illegal = False #flag for whether current player makes the state illegal
+        self.other_could_win = False #flag for checking if the card current player played will make the other win
+
+    def command_line_parser(self, cmd):
+        print(str(cmd))
 
     def toggle_turn(self):
         if self.turn == "color":

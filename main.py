@@ -23,10 +23,22 @@ print("Game initialized, player 1 will have the first move\n")
 
 print("The game board configuration is:\n", g.board)
 
-while g.counter <= 60:
+while g.counter <= 60 and g.current_turn_win is False:
     if current_player.__eq__("Player 1"):
-        print(current_player)
+        player_one_move = input("Player 1: Please give your move:\n")
+        g.command_line_parser(player_one_move)
+        if g.current_turn_win:
+            print(current_player + " wins. Game Over!")
+            break
+        current_player = "Player 2"
 
     else:
-        print(current_player)
+        player_two_move = input("Player 2: Please give your move:\n")
+        g.command_line_parser(player_two_move)
+        if g.current_turn_win:
+            print(current_player + " wins. Game Over!")
+            break
+        current_player = "Player 1"
 
+if g.counter == 60:
+    print("Over 60 moves. Tie!")
