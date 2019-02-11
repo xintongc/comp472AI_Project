@@ -1,13 +1,6 @@
 import numpy as np
 
 
-class Card:
-    def __init__(self, turn):
-        self.turn = turn
-        self.counter = 0
-        self.board = np.empty((12, 8), int)  # initial state
-
-
 class Game:
     def __init__(self, turn):
         self.turn = turn
@@ -35,3 +28,4 @@ class Game:
 p1 = Game("John")
 
 #p1.myfunc()
+
