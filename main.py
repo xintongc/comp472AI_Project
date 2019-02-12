@@ -23,9 +23,9 @@ print("Game initialized, player 1 will have the first move\n")
 
 print("The game board configuration is:\n", g.board)
 
-while g.counter <= 60 and g.current_turn_win is False:
+while g.step_counter <= 60 and g.card_counter <= 24 and g.current_turn_win is False:
     if current_player.__eq__("Player 1"):
-        player_one_move = input("Player 1: Please give your move:\n")
+        player_one_move = input("Player 1: Please place a card:\n")
         g.command_line_parser(player_one_move)
         if g.current_turn_win:
             print(current_player + " wins. Game Over!")
@@ -33,7 +33,24 @@ while g.counter <= 60 and g.current_turn_win is False:
         current_player = "Player 2"
 
     else:
-        player_two_move = input("Player 2: Please give your move:\n")
+        player_two_move = input("Player 2: Please place a card:\n")
+        g.command_line_parser(player_two_move)
+        if g.current_turn_win:
+            print(current_player + " wins. Game Over!")
+            break
+        current_player = "Player 1"
+
+while g.step_counter <= 60 and g.current_turn_win is False:
+    if current_player.__eq__("Player 1"):
+        player_one_move = input("Player 1: Please recycle a card:\n")
+        g.command_line_parser(player_one_move)
+        if g.current_turn_win:
+            print(current_player + " wins. Game Over!")
+            break
+        current_player = "Player 2"
+
+    else:
+        player_two_move = input("Player 2: Please recycle a card:\n")
         g.command_line_parser(player_two_move)
         if g.current_turn_win:
             print(current_player + " wins. Game Over!")
