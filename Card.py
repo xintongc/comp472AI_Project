@@ -43,3 +43,11 @@ class Card:
             self.half1.coordinate = copy.copy(coordinate);
             coordinate[0] = coordinate[0] + 1;
             self.half2.coordinate = coordinate
+
+        #boundary check, if false, it results an illegal state
+        if self.half1.coordinate[0] < 1 or self.half2.coordinate[0] < 1 or self.half1.coordinate[0] > 12 or self.half2.coordinate[0] > 12:
+            return False
+        elif self.half1.coordinate[1] < 0 or self.half2.coordinate[1] < 0 or self.half1.coordinate[1] > 7 or self.half2.coordinate[1] > 7:
+            return False
+        else:
+            return True
