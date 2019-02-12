@@ -132,8 +132,8 @@ class Game:
         print(self.counter)
         print(self.board)
         self.board[12-2][0] = 3 #indicate A 2 --> coordinate [2,0]
+        self.board[12-6][4] = self.card_type_list[7] # meaning place card position 8 on [row = 6, column=4]
         print("-----------------------")
-        print(self.board)
 
 p1 = Game("John")
 
