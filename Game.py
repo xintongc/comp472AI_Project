@@ -107,6 +107,10 @@ class Game:
         print(board)
 
     def play_card(self, card, coordinate):
+        if self.card_counter < 24:
+            print("play card")
+
+
 
         #when card is played, we need to check if it results a valid state(an illegal state, or make others win)
         #if valid, check if the current turn could win
@@ -115,7 +119,8 @@ class Game:
         if(self.current_turn_win == True):
             print("current player win. Game over")
 
-    def validate_state(self, other_role, card, position):
+    def validate_state(self, other_role, card, coordinate):
+
 
         #check if results an illegals state -> set the flag
             #this should immediately give player feedback and let the Player play again
