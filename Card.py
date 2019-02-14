@@ -51,3 +51,9 @@ class Card:
             return False
         else:
             return self.half2.coordinate
+
+    def get_half1_coordinate(self):
+        return self.half1.coordinate
+
+    def get_half2_coordinate(self):
+        return self.half2.coordinate

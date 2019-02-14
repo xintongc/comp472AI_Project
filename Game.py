@@ -10,7 +10,8 @@ class Game:
         self.step_counter = 0
         self.card_counter = 0
         self.board = np.empty((12, 8), Half) #initial state
-        self.card_type_list = self.initialize_cardtype();
+        self.card_type_list = self.initialize_cardtype()
+        self.card_deck = []
 
         self.current_turn_win = False #flag for win for current player
         self.current_makes_illegal = False #flag for whether current player makes the state illegal
@@ -62,6 +63,7 @@ class Game:
 
     def command_line_parser(self, cmd):
         inputs = str(cmd).split(' ')
+        move_type = inputs[0]
         card_type_index = inputs[1] - 1;
         card_column = inputs[2]
         card_row = inputs[3]
@@ -82,7 +84,8 @@ class Game:
         else:
             x = 7
         coordinate = [card_row, x]
-        self.play_card(self.card_type_list[card_type_index], coordinate)
+        if move_type == 0:
+            self.play_card(copy.deepcopy(self.card_type_list[card_type_index]), coordinate)
 
 
     def toggle_turn(self):
@@ -97,45 +100,67 @@ class Game:
         else:
             return "color"
 
+    def current_role(self):
+        if self.turn == "color":
+            return "color"
+        else:
+            return "dot"
+
     def reset_flags(self):
         self.current_turn_win = False;  # flag for win for current player
         self.current_makes_illegal = False;  # flag for whether current player makes the state illegal
         self.other_could_win = False;  # flag for checking if the card current player played will make the other win
 
-    def print_game_board(self):
+    def print_current_game_board_state(self):
         board = np.empty((12, 8), str)
         print(board)
 
     def play_card(self, card, coordinate):
-        if self.card_counter < 24:
-            print("play card")
+        self.reset_flags()
+        if self.card_counter >= 24:  # check whether 24 cards have been played
+            self.current_makes_illegal = True
+            return
+        half2_coordinate = card.set_half_coordinate(card.card_type, coordinate)
+        if not half2_coordinate:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
+            self.current_makes_illegal = True
+            return
+        if self.board[12-coordinate[0]][coordinate[1]] is not None \
+                or self.board[12-half2_coordinate[0]][half2_coordinate[1]] is not None:  # check if both cells are occupied
+            self.current_makes_illegal = True
+            return
+        self.board[12 - coordinate[0]][coordinate[1]] = card.half1 # set board reference to half
+        self.board[12 - half2_coordinate[0]][half2_coordinate[1]] = card.half2
+        if not self.validate_state(card):
+            return
+        self.other_could_win = self.check_if_win(self.other_role(), card)
+        self.current_turn_win = self.check_if_win(self.current_role(), card)
+        if self.current_turn_win is False and self.other_could_win is True:
+            self.board[12 - coordinate[0]][coordinate[1]] = None  # set board reference to None
+            self.board[12 - half2_coordinate[0]][half2_coordinate[1]] = None
+            self.current_makes_illegal = True
+            return
+        self.card_deck.append(card)  #finally, we played the card, and put it in card deck
+        self.print_current_game_board_state()  #display the board and card deck to console
 
 
+    def validate_state(self, card):
+        half1_coordinate = card.get_half1_coordinate()
+        half2_coordinate = card.get_half2_coordinate()
+        try:
+            if self.board[12-half1_coordinate[0]-1][half1_coordinate[1]] is None:
+                self.current_makes_illegal = True
+                return False
+            if self.board[12-half2_coordinate[0]-1][half2_coordinate[1]] is None:
+                self.current_makes_illegal = True
+                return False
+        except IndexError: #means this card is at very bottom
+            return True
 
-        #when card is played, we need to check if it results a valid state(an illegal state, or make others win)
-        #if valid, check if the current turn could win
-        self.validate_state(self, self.other_role(), card, coordinate)
-        self.check_if_win(self.turn, card, coordinate)
-        if(self.current_turn_win == True):
-            print("current player win. Game over")
+    def check_if_win(self, role, card):
+        return True
 
-    def validate_state(self, other_role, card, coordinate):
-
-
-        #check if results an illegals state -> set the flag
-            #this should immediately give player feedback and let the Player play again
-        #check if this could makes the other player win --> set the flag
-            #this is ok if the cuurent player still could win
-        print("in validating state")
-
-    def check_if_win(self, role, card, position):
-        # algorithm to detect whether given card in
-        print(card + position)
-
+    #dummy function to help understand the game board
     def myfunc(self):
-        print("Hello my name is " + self.turn)
-        print(self.counter)
-        print(self.board)
         self.board[12-2][0] = 3 #indicate A 2 --> coordinate [2,0]
         self.board[12-6][4] = self.card_type_list[7] # meaning place card position 8 on [row = 6, column=4]
         print("-----------------------")
