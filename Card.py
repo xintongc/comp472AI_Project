@@ -1,11 +1,11 @@
 import copy
 
 class Card:
-    def __init__(self, card_type, half1, half2, card_id):
+    def __init__(self, card_type, half1, half2):
         self.card_type = card_type
         self.half1 = half1
         self.half2 = half2
-        self.card_id = card_id
+        self.card_id = None
 
     def name(self):
         return self.half1.name() + ' ' + self.half2.name()
@@ -57,3 +57,15 @@ class Card:
 
     def get_half2_coordinate(self):
         return self.half2.coordinate
+
+    def get_half1_color(self):
+        return self.half1.color
+
+    def get_half2_color(self):
+        return self.half2.color
+
+    def get_half1_dot(self):
+        return self.half1.dot
+
+    def get_half2_dot(self):
+        return self.half2.dot

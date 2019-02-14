@@ -59,8 +59,6 @@ class Game:
         card_type_list = [c1, c2, c3, c4, c5, c6, c7, c8]
         return card_type_list
 
-
-
     def command_line_parser(self, cmd):
         inputs = str(cmd).split(' ')
         move_type = inputs[0]
@@ -86,7 +84,6 @@ class Game:
         coordinate = [card_row, x]
         if move_type == 0:
             self.play_card(copy.deepcopy(self.card_type_list[card_type_index]), coordinate)
-
 
     def toggle_turn(self):
         if self.turn == "color":
@@ -140,6 +137,8 @@ class Game:
             self.current_makes_illegal = True
             return
         self.card_deck.append(card)  #finally, we played the card, and put it in card deck
+        self.step_counter += 1
+        self.toggle_turn()
         self.print_current_game_board_state()  #display the board and card deck to console
 
 
@@ -157,15 +156,119 @@ class Game:
             return True
 
     def check_if_win(self, role, card):
-        return True
+        half1_color = card.get_half1_color()
+        half1_dot = card.get_half1_dot()
+        half1_coordinate = card.get_half1_coordinate()
+        half2_color = card.get_half2_color()
+        half2_dot = card.get_half2_dot()
+        half2_coordinate = card.get_half2_coordinate()
+        if role == "color":
+            half1_color_map = self.check(half1_color, half1_coordinate)
+            if half1_color_map.__sizeof__() > 1:
+                print("--------win with four ", half1_color, " in line")
+                return True
+            half2_color_map = self.check(half2_color, half2_coordinate)
+            if half2_color_map.__sizeof__() > 1:
+                print("--------win with four ", half2_color, " in line")
+                return True
+        if role == "dot":
+            half1_dot_map = self.check(half1_dot, half1_coordinate)
+            if half1_dot_map.__sizeof__() > 1:
+                print("--------win with four ", half1_dot, " in line")
+                return True
+            half2_dot_map = self.check(half2_dot, half2_coordinate)
+            if half2_dot_map.__sizeof__() > 1:
+                print("--------win with four ", half2_dot, " in line")
+                return True
+        return False
+
+    def check(self, role_token, coordinate):
+        direction_map = {}
+        t = self.recursive_check_in_direction("t", role_token, coordinate, 1)
+        b = self.recursive_check_in_direction("b", role_token, coordinate, 1)
+        if t + b >=3:
+            direction_map["t"] = t
+            direction_map["b"] = b
+            return direction_map
+
+        tr = self.recursive_check_in_direction("tr", role_token, coordinate, 1)
+        bl = self.recursive_check_in_direction("bl", role_token, coordinate, 1)
+        if tr + bl >= 3:
+            direction_map["tr"] = tr
+            direction_map["bl"] = bl
+            return direction_map
+
+        r = self.check_in_direction_with_distance("r", role_token, coordinate, 1)
+        l = self.check_in_direction_with_distance("l", role_token, coordinate, 1)
+        if r + l >= 3:
+            direction_map["r"] = r
+            direction_map["l"] = l
+            return direction_map
+
+        rb = self.check_in_direction_with_distance("rb", role_token, coordinate, 1)
+        lt = self.check_in_direction_with_distance("lt", role_token, coordinate, 1)
+        if lt + rb >= 3:
+            direction_map["rb"] = rb
+            direction_map["lt"] = lt
+            return direction_map
+
+    def check_in_direction_with_distance(self, direction, role_token, coordinate, distance):
+        num_in_line = 0
+        while distance < 4:
+            try:
+                if direction == "t":
+                    if role_token == self.board[12 - coordinate[0]+distance][coordinate[1]]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "tr":
+                    if role_token == self.board[12 - coordinate[0]+distance][coordinate[1]+distance]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "r":
+                    if role_token == self.board[12 - coordinate[0]][coordinate[1]+distance]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "rb":
+                    if role_token == self.board[12 - coordinate[0]-distance][coordinate[1]+distance]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "b":
+                    if role_token == self.board[12 - coordinate[0]-distance][coordinate[1]]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "bl":
+                    if role_token == self.board[12 - coordinate[0]-distance][coordinate[1]-distance]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "l":
+                    if role_token == self.board[12 - coordinate[0]][coordinate[1]-distance]:
+                        num_in_line += 1
+                    else:
+                        break
+                if direction == "lt":
+                    if role_token == self.board[12 - coordinate[0]+distance][coordinate[1]-distance]:
+                        num_in_line += 1
+                    else:
+                        break
+                distance += 1
+            except IndexError:  # means this card is at very bottom
+                num_in_line += 0
+                break
+        return num_in_line
+
 
     #dummy function to help understand the game board
     def myfunc(self):
         self.board[12-2][0] = 3 #indicate A 2 --> coordinate [2,0]
-        self.board[12-6][4] = self.card_type_list[7] # meaning place card position 8 on [row = 6, column=4]
-        print("-----------------------")
+        self.board[12-6][4] =copy.deepcopy(self.card_type_list[7]) # meaning place card position 8 on [row = 6, column=4]
 
 p1 = Game("John")
 
-#p1.myfunc()
+p1.print_current_game_board_state()
 
