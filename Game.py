@@ -152,6 +152,7 @@ class Game:
             if self.board[12-half2_coordinate[0]-1][half2_coordinate[1]] is None:
                 self.current_makes_illegal = True
                 return False
+            return True
         except IndexError: #means this card is at very bottom
             return True
 
@@ -184,15 +185,15 @@ class Game:
 
     def check(self, role_token, coordinate):
         direction_map = {}
-        t = self.recursive_check_in_direction("t", role_token, coordinate, 1)
-        b = self.recursive_check_in_direction("b", role_token, coordinate, 1)
+        t = self.check_in_direction_with_distance("t", role_token, coordinate, 1)
+        b = self.check_in_direction_with_distance("b", role_token, coordinate, 1)
         if t + b >=3:
             direction_map["t"] = t
             direction_map["b"] = b
             return direction_map
 
-        tr = self.recursive_check_in_direction("tr", role_token, coordinate, 1)
-        bl = self.recursive_check_in_direction("bl", role_token, coordinate, 1)
+        tr = self.check_in_direction_with_distance("tr", role_token, coordinate, 1)
+        bl = self.check_in_direction_with_distance("bl", role_token, coordinate, 1)
         if tr + bl >= 3:
             direction_map["tr"] = tr
             direction_map["bl"] = bl
