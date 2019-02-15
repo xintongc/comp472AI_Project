@@ -10,6 +10,7 @@ class Game:
         self.step_counter = 0
         self.card_counter = 0
         self.board = np.empty((12, 8), Half) #initial state
+        self.board_visual = np.empty((12, 8), str)  # initial state
         self.card_type_list = self.initialize_cardtype()
         self.card_deck = []
 
@@ -83,7 +84,9 @@ class Game:
             x = 7
         coordinate = [card_row, x]
         if move_type == 0:
-            self.play_card(copy.deepcopy(self.card_type_list[card_type_index]), coordinate)
+            card = copy.deepcopy(self.card_type_list[card_type_index])
+            card.set_cardId(len(self.card_deck)+1)
+            self.play_card(card, coordinate)
 
     def toggle_turn(self):
         if self.turn == "color":
@@ -109,8 +112,10 @@ class Game:
         self.other_could_win = False;  # flag for checking if the card current player played will make the other win
 
     def print_current_game_board_state(self):
-        board = np.empty((12, 8), str)
-        print(board)
+        print("The game board is \n")
+        print(self.board_visual)
+        print("The card deck is \n")
+        print(self.card_deck)
 
     def play_card(self, card, coordinate):
         self.reset_flags()
@@ -137,6 +142,8 @@ class Game:
             self.current_makes_illegal = True
             return
         self.card_deck.append(card)  #finally, we played the card, and put it in card deck
+        self.board_visual[12 - coordinate[0]][coordinate[1]] = str(card.half1.get_cardId() + "-" + card.half1.color + card.half1.dot)  # set board reference to half
+        self.board_visual[12 - half2_coordinate[0]][half2_coordinate[1]] = str(card.half2.get_cardId() + "-" + card.half2.color + card.half2.dot)
         self.step_counter += 1
         self.toggle_turn()
         self.print_current_game_board_state()  #display the board and card deck to console
@@ -187,7 +194,7 @@ class Game:
         direction_map = {}
         t = self.check_in_direction_with_distance("t", role_token, coordinate, 1)
         b = self.check_in_direction_with_distance("b", role_token, coordinate, 1)
-        if t + b >=3:
+        if t + b >= 3:
             direction_map["t"] = t
             direction_map["b"] = b
             return direction_map
