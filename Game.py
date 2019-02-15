@@ -273,10 +273,12 @@ class Game:
 
     #dummy function to help understand the game board
     def myfunc(self):
-        self.board[12-2][0] = 3 #indicate A 2 --> coordinate [2,0]
-        self.board[12-6][4] =copy.deepcopy(self.card_type_list[7]) # meaning place card position 8 on [row = 6, column=4]
+        board = np.empty((12,8), str)
+        board[12-2][0] = 3 #indicate A 2 --> coordinate [2,0]
+        board[12-6][4] = 5 # meaning place card position 8 on [row = 6, column=4]
+        print(board)
 
 p1 = Game("John")
 
-p1.print_current_game_board_state()
+p1.myfunc()
 
