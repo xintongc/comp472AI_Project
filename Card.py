@@ -69,3 +69,9 @@ class Card:
 
     def get_half2_dot(self):
         return self.half2.dot
+
+    def set_cardId(self, card_id):
+        self.card_id = card_id
+
+    def get_cardId(self):
+        return self.card_id
