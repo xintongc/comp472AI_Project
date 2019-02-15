@@ -7,3 +7,9 @@ class Half:
 
     def name(self):
         return self.color + self.dot
+
+    def match_with_role_token(self, role_token):
+        if role_token == self.color or role_token == self.dot:
+            return True
+        else:
+            return False

@@ -57,3 +57,15 @@ class Card:
 
     def get_half2_coordinate(self):
         return self.half2.coordinate
+
+    def get_half1_color(self):
+        return self.half1.color
+
+    def get_half2_color(self):
+        return self.half2.color
+
+    def get_half1_dot(self):
+        return self.half1.dot
+
+    def get_half2_dot(self):
+        return self.half2.dot
