@@ -218,42 +218,42 @@ class Game:
         while distance < 4:
             try:
                 if direction == "t":
-                    if role_token == self.board[12 - coordinate[0]+distance][coordinate[1]]:
+                    if self.board[12 - coordinate[0]+distance][coordinate[1]].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "tr":
-                    if role_token == self.board[12 - coordinate[0]+distance][coordinate[1]+distance]:
+                    if self.board[12 - coordinate[0]+distance][coordinate[1]+distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "r":
-                    if role_token == self.board[12 - coordinate[0]][coordinate[1]+distance]:
+                    if self.board[12 - coordinate[0]][coordinate[1]+distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "rb":
-                    if role_token == self.board[12 - coordinate[0]-distance][coordinate[1]+distance]:
+                    if self.board[12 - coordinate[0]-distance][coordinate[1]+distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "b":
-                    if role_token == self.board[12 - coordinate[0]-distance][coordinate[1]]:
+                    if self.board[12 - coordinate[0]-distance][coordinate[1]].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "bl":
-                    if role_token == self.board[12 - coordinate[0]-distance][coordinate[1]-distance]:
+                    if self.board[12 - coordinate[0]-distance][coordinate[1]-distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "l":
-                    if role_token == self.board[12 - coordinate[0]][coordinate[1]-distance]:
+                    if self.board[12 - coordinate[0]][coordinate[1]-distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "lt":
-                    if role_token == self.board[12 - coordinate[0]+distance][coordinate[1]-distance]:
+                    if self.board[12 - coordinate[0]+distance][coordinate[1]-distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
