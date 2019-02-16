@@ -112,8 +112,24 @@ class Game:
             return 6
         elif card_column == "G":
             return 7
-        else:
+        elif card_column == "H":
             return 8
+        else:
+            return 0
+
+    @staticmethod
+    def parse_row(card_row):
+        if not type(card_row) == int:
+            return 0
+        else:
+            row = int(card_row)
+            if row > 0 and row < 13:
+                return row
+            else:
+                return 0
+
+
+
 
     def command_line_parser(self, cmd):
         inputs = str(cmd).split(' ')
@@ -458,8 +474,8 @@ def get_type(half_type, row1, column1, row2, column2): #get the type according t
         return 6
 
 
-
-
+# def validate_input(card_type, row1, colunm1):
+#     if validate_row(row1) and validate_column(column1)
 
 
 step_counter = 0
@@ -474,14 +490,23 @@ while step_counter <= 60:
     while card_id <= 3: #put 3 for test, actural num is 23
         playerId = toggle_player(playerId)
         Game.print_card_type()
+
         card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
-        half_name1 = first_half_name(card_type)
-        half_name2 = second_half_name(card_type)
-        row1 = int(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+        row1 = Game.parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
         row2 = second_half_row(card_type, row1)
         column = input("Player " + playerId + ": Please choose your card column from A - H:")
         column1 = Game.parse_colunm(column)
         column2 = second_half_column(card_type, column1)
+        while not is_state_valid():
+            card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
+            row1 = Game.parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+            row2 = second_half_row(card_type, row1)
+            column = input("Player " + playerId + ": Please choose your card column from A - H:")
+            column1 = Game.parse_colunm(column)
+            column2 = second_half_column(card_type, column1)
+            
+        half_name1 = first_half_name(card_type)
+        half_name2 = second_half_name(card_type)
         card_num = incre_card_id()
         place_half(half_name1, row1, column1)
         place_half(half_name2, row2, column2)
@@ -502,7 +527,7 @@ while step_counter <= 60:
         half_name2 = board_visual[12 - row2][column2]
         recycle_card(row1, column1, row2, column2)
         print_board()
-        row1 = int(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
+        row1 = Game.parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
         column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
         column1 = Game.parse_colunm(column)
         place_half(half_name1, row1, column1)
