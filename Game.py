@@ -188,51 +188,18 @@ class Game:
         print("The card deck is \n")
         print(self.card_deck)
 
-    def play_card(self, card, coordinate):
+
+    def is_state_valid(self, row1, column1, row2, column2):
+        global board_visual
         self.reset_flags()
-        if self.card_counter >= 24:  # check whether 24 cards have been played
-            self.current_makes_illegal = True
-            return
-        half2_coordinate = card.set_half_coordinate(card.card_type, coordinate)
-        if not half2_coordinate:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
-            self.current_makes_illegal = True
-            return
-        if self.board[12-coordinate[0]][coordinate[1]] is not None \
-                or self.board[12-half2_coordinate[0]][half2_coordinate[1]] is not None:  # check if both cells are occupied
-            self.current_makes_illegal = True
-            return
-        self.board[12 - coordinate[0]][coordinate[1]] = card.half1 # set board reference to half
-        self.board[12 - half2_coordinate[0]][half2_coordinate[1]] = card.half2
-        if not self.validate_state(card):
-            return
-        self.other_could_win = self.check_if_win(self.other_role(), card)
-        self.current_turn_win = self.check_if_win(self.current_role(), card)
-        if self.current_turn_win is False and self.other_could_win is True:
-            self.board[12 - coordinate[0]][coordinate[1]] = None  # set board reference to None
-            self.board[12 - half2_coordinate[0]][half2_coordinate[1]] = None
-            self.current_makes_illegal = True
-            return
-        self.card_deck.append(card)  #finally, we played the card, and put it in card deck
-        self.board_visual[12 - coordinate[0]][coordinate[1]] = str(card.half1.get_cardId() + "-" + card.half1.color + card.half1.dot)  # set board reference to half
-        self.board_visual[12 - half2_coordinate[0]][half2_coordinate[1]] = str(card.half2.get_cardId() + "-" + card.half2.color + card.half2.dot)
-        self.step_counter += 1
-        self.toggle_turn()
-        self.print_current_game_board_state()  #display the board and card deck to console
-
-
-    def validate_state(self, card):
-        half1_coordinate = card.get_half1_coordinate()
-        half2_coordinate = card.get_half2_coordinate()
-        try:
-            if self.board[12-half1_coordinate[0]-1][half1_coordinate[1]] is None:
-                self.current_makes_illegal = True
-                return False
-            if self.board[12-half2_coordinate[0]-1][half2_coordinate[1]] is None:
-                self.current_makes_illegal = True
-                return False
-            return True
-        except IndexError: #means this card is at very bottom
-            return True
+        if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
+            return False
+        if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
+            return False
+        if board_visual[12-row1-1][column1] == '  ' or board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
+            return False
+        else:
+            return False
 
     def check_if_win(self, role, card):
         half1_color = card.get_half1_color()
