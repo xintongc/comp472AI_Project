@@ -408,7 +408,7 @@ def is_state_valid(row1, column1, row2, column2):
     if board_visual[12-row1+1][column1] == '  ' or board_visual[12-row2+1][column2] == '  ':# check if both cells are occupied
         return False
     else:
-        return False
+        return True
 
 
 def is_recycle_valid(row1, column1, row2, column2):
