@@ -405,24 +405,29 @@ def is_state_valid(row1, column1, row2, column2):
         return False
     if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
         return False
-    if board_visual[12-row1-1][column1] == '  ' or board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
+    if board_visual[12-row1+1][column1] == '  ' or board_visual[12-row2+1][column2] == '  ':# check if both cells are occupied
         return False
     else:
         return False
 
 
 def is_recycle_valid(row1, column1, row2, column2):
-    if board_visual[12-row1+1][column1] == '  ' or board_visual[12-row2+1][column2] == '  ':# check if both cells are occupied
-        return False
-    else:
+    try:
+        if abs(row1-row2) == 1:
+            if board_visual[12-row1-1][column1] == '  ' and board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
+                return False
+            else:
+                return True
+        if abs(column1-column2) == 1:
+            if board_visual[12 - row1 - 1][column1] == '  ' or board_visual[12 - row2 - 1][column2] == '  ':  # check if both cells are occupied
+                return False
+            else:
+                return True
+    except IndexError:  # means this card is at very bottom
         return True
 
 
-<<<<<<< Updated upstream
 def is_int(n):
-=======
-def is_recycle_allowed(row1, column1, row2, column2):
->>>>>>> Stashed changes
     try:
         int(n)
         return True
