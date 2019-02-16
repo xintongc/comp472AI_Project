@@ -357,11 +357,6 @@ else:
     role_two = "color"
 print("Your counterpart(Player 2), will be playing: " + role_two)
 
-step_counter = 0
-valid_card_position = False
-playerId = '2'
-card_id = 0
-
 
 def toggle_player(player):
     if player == '1':
@@ -411,32 +406,115 @@ def place_half(type_str, row_num, column_num):
     board_visual[12 - row_num][column_num] = type_str
 
 
-def print_board_card(row_num1, column_num1,row_num2, column_num2):
+def incre_card_id():
     global card_id
     global board_card
     card_id = card_id + 1
     card_id_str = str(card_id)
-    if(len(card_id_str) < 2):
+    if (len(card_id_str) < 2):
         card_id_str = '0' + card_id_str
-    board_card[12 - row_num1][column_num1] = card_id_str
-    board_card[12 - row_num2][column_num2] = card_id_str
+    return card_id_str
+
+
+def put_board_card(card_num, row_num1, column_num1,row_num2, column_num2):
+    board_card[12 - row_num1][column_num1] = card_num
+    board_card[12 - row_num2][column_num2] = card_num
+    dict_row[card_num] = row_num2  #create 2 dictionary, we can find the other halfs position according to card_id, used for recycle
+    dict_column[card_num] = column2
+
+
+
+def print_board_card():
     print()
     for item in board_card:
         print(item)
 
 
+def recycle_card(row_num, column_num, row_num2, column_num2):
+    global board_visual
+    global board_card
+    board_visual[12 - row_num][column_num] = '  '#set the recycled card coordinate empty
+    board_visual[12 - row_num2][column_num2] = '  '
+    board_card[12 - row_num][column_num] = '  '
+    board_card[12 - row_num2][column_num2] = '  '
+
+
+def get_type(half_type, row1, column1, row2, column2): #get the type according to the relative position of the other half
+    if row1 == row2 and half_type == "RX":
+        return 1
+    if row1 == row2 and half_type == "WO":
+        return 3
+    if row1 == row2 and half_type == "RO":
+        return 5
+    if row1 == row2 and half_type == "WX":
+        return 7
+    if column1 == column2 and half_type == "RX":
+        return 4
+    if column1 == column2 and half_type == "WO":
+        return 2
+    if column1 == column2 and half_type == "RO":
+        return 8
+    if column1 == column2 and half_type == "WX":
+        return 6
+
+
+
+
+
+
+step_counter = 0
+valid_card_position = False
+playerId = '2'
+card_id = 0
+dict_row = {}
+dict_column = {}
+
+
 while step_counter <= 60:
-    playerId = toggle_player(playerId)
-    Game.print_card_type()
-    card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
-    half_name1 = first_half_name(card_type)
-    half_name2 = second_half_name(card_type)
-    row1 = int(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
-    row2 = second_half_row(card_type, row1)
-    column = input("Player " + playerId + ": Please choose your card column from A - H:")
-    column1 = Game.parse_colunm(column)
-    column2 = second_half_column(card_type, column1)
-    place_half(half_name1, row1, column1)
-    place_half(half_name2, row2, column2)
-    print_board()
-    print_board_card(row1, column1, row2, column2)
+    while card_id <= 3: #put 3 for test, actural num is 23
+        playerId = toggle_player(playerId)
+        Game.print_card_type()
+        card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
+        half_name1 = first_half_name(card_type)
+        half_name2 = second_half_name(card_type)
+        row1 = int(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+        row2 = second_half_row(card_type, row1)
+        column = input("Player " + playerId + ": Please choose your card column from A - H:")
+        column1 = Game.parse_colunm(column)
+        column2 = second_half_column(card_type, column1)
+        card_num = incre_card_id()
+        place_half(half_name1, row1, column1)
+        place_half(half_name2, row2, column2)
+        print_board()
+        put_board_card(card_num, row1, column1, row2, column2)
+        print_board_card()
+        step_counter = step_counter + 1
+    while card_id > 3:
+        playerId = toggle_player(playerId)
+        Game.print_card_type()
+        row1 = int(input("Player " + playerId + ": Please type the recycle card row:"))
+        column = input("Player " + playerId + ": Please type the recycle card column:")
+        column1 = Game.parse_colunm(column)
+        recycle_card_id = board_card[12 - row1][column1]
+        row2 = dict_row[recycle_card_id]
+        column2 = dict_column[recycle_card_id]
+        half_name1 = board_visual[12 - row1][column1]
+        half_name2 = board_visual[12 - row2][column2]
+        recycle_card(row1, column1, row2, column2)
+        print_board()
+        row1 = int(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
+        column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
+        column1 = Game.parse_colunm(column)
+        place_half(half_name1, row1, column1)
+        row2 = second_half_row(card_type, row1)
+        column2 = second_half_column(card_type, column1)
+        place_half(half_name2, row2, column2)
+        print_board()
+        put_board_card(recycle_card_id, row1, column1, row2, column2)
+        print_board_card()
+
+
+
+
+
+
