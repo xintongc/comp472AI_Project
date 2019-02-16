@@ -398,6 +398,7 @@ def is_color_dot_valid(t):
         return False
 
 
+
 def is_state_valid(row1, column1, row2, column2):
     global board_visual
     if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
@@ -417,7 +418,11 @@ def is_recycle_valid(row1, column1, row2, column2):
         return True
 
 
+<<<<<<< Updated upstream
 def is_int(n):
+=======
+def is_recycle_allowed(row1, column1, row2, column2):
+>>>>>>> Stashed changes
     try:
         int(n)
         return True
@@ -464,6 +469,104 @@ def parse_colunm(card_column):
     else:
         return 0
 
+
+
+def check_if_win(role, type_str, row_num, column_num):
+    half_color = type_str[0]
+    half_dot = type_str[1]
+    half_coordinate = [row_num, column_num]
+    if role == "color":
+        half1_color_map = check(half_color, half_coordinate)
+        if half1_color_map.__sizeof__() > 1:
+            print("--------win with four ", half_color, " in line")
+            return True
+    if role == "dot":
+        half1_dot_map = check(half_dot, half_coordinate)
+        if half1_dot_map.__sizeof__() > 1:
+            print("--------win with four ", half_dot, " in line")
+            return True
+    return False
+
+def check(self, role_token, coordinate):
+    direction_map = {}
+    t = self.check_in_direction_with_distance("t", role_token, coordinate, 1)
+    b = self.check_in_direction_with_distance("b", role_token, coordinate, 1)
+    if t + b >= 3:
+        direction_map["t"] = t
+        direction_map["b"] = b
+        return direction_map
+
+    tr = self.check_in_direction_with_distance("tr", role_token, coordinate, 1)
+    bl = self.check_in_direction_with_distance("bl", role_token, coordinate, 1)
+    if tr + bl >= 3:
+        direction_map["tr"] = tr
+        direction_map["bl"] = bl
+        return direction_map
+
+    r = self.check_in_direction_with_distance("r", role_token, coordinate, 1)
+    l = self.check_in_direction_with_distance("l", role_token, coordinate, 1)
+    if r + l >= 3:
+        direction_map["r"] = r
+        direction_map["l"] = l
+        return direction_map
+
+    rb = self.check_in_direction_with_distance("rb", role_token, coordinate, 1)
+    lt = self.check_in_direction_with_distance("lt", role_token, coordinate, 1)
+    if lt + rb >= 3:
+        direction_map["rb"] = rb
+        direction_map["lt"] = lt
+        return direction_map
+
+def check_in_direction_with_distance(direction, role_token, coordinate, distance):
+    global board_card
+    num_in_line = 0
+    while distance < 4:
+        try:
+            if direction == "t":
+                if role_token in board_card[12 - coordinate[0]-distance][coordinate[1]]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "tr":
+                if role_token in board_card[12 - coordinate[0]-distance][coordinate[1]+distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "r":
+                if role_token in board_card[12 - coordinate[0]][coordinate[1]+distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "rb":
+                if role_token in board_card[12 - coordinate[0]+distance][coordinate[1]+distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "b":
+                if role_token in board_card[12 - coordinate[0]+distance][coordinate[1]]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "bl":
+                if role_token in board_card[12 - coordinate[0]+distance][coordinate[1]-distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "l":
+                if role_token in board_card[12 - coordinate[0]][coordinate[1]-distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "lt":
+                if role_token in board_card[12 - coordinate[0]-distance][coordinate[1]-distance]:
+                    num_in_line += 1
+                else:
+                    break
+            distance += 1
+        except IndexError:  # means this card is at very bottom
+            num_in_line += 0
+            break
+    return num_in_line
 
 step_counter = 0
 valid_card_position = False
