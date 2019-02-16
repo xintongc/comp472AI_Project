@@ -3,6 +3,34 @@ from Card import *
 from Half import *
 import copy
 
+board_visual = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['11', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['10', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['09', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['08', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['07', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['06', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['05', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['04', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['03', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['02', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['01', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+                ['  ', 'A ', 'B ', 'C ', 'D ', 'E ', 'F ', 'G ', 'H ']]
+
+board_card = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['11', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['10', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['09', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['08', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['07', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['06', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['05', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['04', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['03', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['02', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['01', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
+              ['  ', 'A ', 'B ', 'C ', 'D ', 'E ', 'F ', 'G ', 'H ']]
+
 
 class Game:
     def __init__(self, turn):
@@ -59,6 +87,33 @@ class Game:
 
         card_type_list = [c1, c2, c3, c4, c5, c6, c7, c8]
         return card_type_list
+
+    @staticmethod
+    def print_card_type():
+        print()
+        print("1        2       3       4       5       6       7       8")
+        print("RX WO    RX      WO RX   WO      RO WX   RO      WX RO   WX")
+        print("         WO              RX              WX              RO")
+        print()
+
+    @staticmethod
+    def parse_colunm(card_column):
+        if card_column == "A":
+            return 1
+        elif card_column == "B":
+            return 2
+        elif card_column == "C":
+            return 3
+        elif card_column == "D":
+            return 4
+        elif card_column == "E":
+            return 5
+        elif card_column == "F":
+            return 6
+        elif card_column == "G":
+            return 7
+        else:
+            return 8
 
     def command_line_parser(self, cmd):
         inputs = str(cmd).split(' ')
@@ -270,15 +325,118 @@ class Game:
                 break
         return num_in_line
 
-
     #dummy function to help understand the game board
-    def myfunc(self):
-        board = np.empty((12,8), str)
-        board[12-2][0] = 3 #indicate A 2 --> coordinate [2,0]
-        board[12-6][4] = 5 # meaning place card position 8 on [row = 6, column=4]
-        print(board)
+#     def myfunc(self):
+#         board = np.empty(12, 8)
+#         board[12-2][0] = "WO" #indicate A 2 --> coordinate [2,0]
+#         board[12-6][4] = "RX" # meaning place card position 8 on [row = 6, column=4]
+#         print(board)
+#
+#
+# p1 = Game("John")
+#
+# p1.myfunc()
 
-p1 = Game("John")
 
-p1.myfunc()
+def print_board():
+    for item in board_visual:
+        print(item)
 
+
+role_select = input("Player1: Please choose a role to play (c for color and d for dot)\n")
+player_one = str(role_select)
+
+if player_one.__eq__("c"):
+    role_one = "color"
+else:
+    role_one = "dot"
+print("Player 1, you are playing: " + role_one)
+if role_one.__eq__("color"):
+    role_two = "dot"
+else:
+    role_two = "color"
+print("Your counterpart(Player 2), will be playing: " + role_two)
+
+step_counter = 0
+valid_card_position = False
+playerId = '2'
+card_id = 0
+
+
+def toggle_player(player):
+    if player == '1':
+        return '2'
+    else:
+        return '1'
+
+
+def second_half_name(card_typeid):
+    if card_typeid == 1 or card_typeid == 4:
+        return "WO"
+    if card_typeid == 2 or card_typeid == 3:
+        return "RX"
+    if card_typeid == 6 or card_typeid == 7:
+        return "RO"
+    if card_typeid == 5 or card_typeid == 8:
+        return "WX"
+
+
+def first_half_name(card_typeid):
+    if card_typeid == 2 or card_typeid == 3:
+        return "WO"
+    if card_typeid == 1 or card_typeid == 4:
+        return "RX"
+    if card_typeid == 5 or card_typeid == 8:
+        return "RO"
+    if card_typeid == 6 or card_typeid == 7:
+        return "WX"
+
+
+def second_half_row(card_typeid, row_num):
+    if card_typeid == 1 or card_typeid == 3 or card_typeid == 5 or card_typeid == 7:
+        return row_num
+    else:
+        return row_num + 1
+
+
+def second_half_column(card_typeid, column_num):
+    if card_typeid == 1 or card_typeid == 3 or card_typeid == 5 or card_typeid == 7:
+        return column_num + 1
+    else:
+        return column_num
+
+
+def place_half(type_str, row_num, column_num):
+    global board_visual
+    board_visual[12 - row_num][column_num] = type_str
+
+
+def print_board_card(row_num1, column_num1,row_num2, column_num2):
+    global card_id
+    global board_card
+    card_id = card_id + 1
+    card_id_str = str(card_id)
+    if(len(card_id_str) < 2):
+        card_id_str = '0' + card_id_str
+    board_card[12 - row_num1][column_num1] = card_id_str
+    board_card[12 - row_num2][column_num2] = card_id_str
+    print()
+    for item in board_card:
+        print(item)
+
+
+while step_counter <= 60:
+    playerId = toggle_player(playerId)
+    Game.print_card_type()
+    card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
+    half_name1 = first_half_name(card_type)
+    half_name2 = second_half_name(card_type)
+    row1 = int(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+    row2 = second_half_row(card_type, row1)
+    column = input("Player " + playerId + ": Please choose your card column from A - H:")
+    column1 = Game.parse_colunm(column)
+    column2 = second_half_column(card_type, column1)
+    place_half(half_name1, row1, column1)
+    place_half(half_name2, row2, column2)
+    print_board()
+    print_board_card(row1, column1, row2, column2)

@@ -1,5 +1,7 @@
 from Game import *
 
+Game.print_card_type()
+
 role_select = input("Please choose a role to play (c for color and d for dot)\n")
 
 player_one = str(role_select)
