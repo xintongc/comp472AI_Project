@@ -414,12 +414,12 @@ def is_state_valid(row1, column1, row2, column2):
 def is_recycle_valid(row1, column1, row2, column2):
     try:
         if abs(row1-row2) == 1:
-            if board_visual[12-row1-1][column1] == '  ' and board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
+            if board_visual[12-row1-1][column1] != '  ' and board_visual[12-row2-1][column2] != '  ':# check if both cells are occupied
                 return False
             else:
                 return True
         if abs(column1-column2) == 1:
-            if board_visual[12 - row1 - 1][column1] == '  ' or board_visual[12 - row2 - 1][column2] == '  ':  # check if both cells are occupied
+            if board_visual[12 - row1 - 1][column1] != '  ' or board_visual[12 - row2 - 1][column2] != '  ':  # check if both cells are occupied
                 return False
             else:
                 return True
@@ -492,31 +492,31 @@ def check_if_win(role, type_str, row_num, column_num):
             return True
     return False
 
-def check(self, role_token, coordinate):
+def check(role_token, coordinate):
     direction_map = {}
-    t = self.check_in_direction_with_distance("t", role_token, coordinate, 1)
-    b = self.check_in_direction_with_distance("b", role_token, coordinate, 1)
+    t = check_in_direction_with_distance("t", role_token, coordinate, 1)
+    b = check_in_direction_with_distance("b", role_token, coordinate, 1)
     if t + b >= 3:
         direction_map["t"] = t
         direction_map["b"] = b
         return direction_map
 
-    tr = self.check_in_direction_with_distance("tr", role_token, coordinate, 1)
-    bl = self.check_in_direction_with_distance("bl", role_token, coordinate, 1)
+    tr = check_in_direction_with_distance("tr", role_token, coordinate, 1)
+    bl = check_in_direction_with_distance("bl", role_token, coordinate, 1)
     if tr + bl >= 3:
         direction_map["tr"] = tr
         direction_map["bl"] = bl
         return direction_map
 
-    r = self.check_in_direction_with_distance("r", role_token, coordinate, 1)
-    l = self.check_in_direction_with_distance("l", role_token, coordinate, 1)
+    r = check_in_direction_with_distance("r", role_token, coordinate, 1)
+    l = check_in_direction_with_distance("l", role_token, coordinate, 1)
     if r + l >= 3:
         direction_map["r"] = r
         direction_map["l"] = l
         return direction_map
 
-    rb = self.check_in_direction_with_distance("rb", role_token, coordinate, 1)
-    lt = self.check_in_direction_with_distance("lt", role_token, coordinate, 1)
+    rb = check_in_direction_with_distance("rb", role_token, coordinate, 1)
+    lt = check_in_direction_with_distance("lt", role_token, coordinate, 1)
     if lt + rb >= 3:
         direction_map["rb"] = rb
         direction_map["lt"] = lt
@@ -569,7 +569,7 @@ def check_in_direction_with_distance(direction, role_token, coordinate, distance
                     break
             distance += 1
         except IndexError:  # means this card is at very bottom
-            num_in_line += 0
+            #num_in_line += 0
             break
     return num_in_line
 
