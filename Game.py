@@ -436,13 +436,25 @@ def get_type(half_type, row1, column1, row2, column2): #get the type according t
     if column1 == column2 and half_type == "WO":
         return 2
     if column1 == column2 and half_type == "RO":
-        return 8
+            return 8
     if column1 == column2 and half_type == "WX":
-        return 6
-
+            return 6
 
 # def validate_input(card_type, row1, colunm1):
 #     if validate_row(row1) and validate_column(column1)
+
+def is_state_valid(self, row1, column1, row2, column2):
+    global board_visual
+    self.reset_flags()
+    if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
+        return False
+    if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
+        return False
+    if board_visual[12-row1-1][column1] == '  ' or board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
+        return False
+    else:
+        return False
+
 
 
 step_counter = 0
