@@ -88,49 +88,6 @@ class Game:
         card_type_list = [c1, c2, c3, c4, c5, c6, c7, c8]
         return card_type_list
 
-    @staticmethod
-    def print_card_type():
-        print()
-        print("1        2       3       4       5       6       7       8")
-        print("RX WO    RX      WO RX   WO      RO WX   RO      WX RO   WX")
-        print("         WO              RX              WX              RO")
-        print()
-
-    @staticmethod
-    def parse_colunm(card_column):
-        if card_column == "A":
-            return 1
-        elif card_column == "B":
-            return 2
-        elif card_column == "C":
-            return 3
-        elif card_column == "D":
-            return 4
-        elif card_column == "E":
-            return 5
-        elif card_column == "F":
-            return 6
-        elif card_column == "G":
-            return 7
-        elif card_column == "H":
-            return 8
-        else:
-            return 0
-
-    @staticmethod
-    def parse_row(card_row):
-        if not type(card_row) == int:
-            return 0
-        else:
-            row = int(card_row)
-            if row > 0 and row < 13:
-                return row
-            else:
-                return 0
-
-
-
-
     def command_line_parser(self, cmd):
         inputs = str(cmd).split(' ')
         move_type = inputs[0]
@@ -188,18 +145,18 @@ class Game:
         print("The card deck is \n")
         print(self.card_deck)
 
-
-    def is_state_valid(self, row1, column1, row2, column2):
-        global board_visual
-        self.reset_flags()
-        if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
-            return False
-        if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
-            return False
-        if board_visual[12-row1-1][column1] == '  ' or board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
-            return False
-        else:
-            return False
+    #
+    # def is_state_valid(self, row1, column1, row2, column2):
+    #     global board_visual
+    #     self.reset_flags()
+    #     if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
+    #         return False
+    #     if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
+    #         return False
+    #     if board_visual[12-row1-1][column1] == '  ' or board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
+    #         return False
+    #     else:
+    #         return False
 
     def check_if_win(self, role, card):
         half1_color = card.get_half1_color()
@@ -326,21 +283,6 @@ def print_board():
         print(item)
 
 
-role_select = input("Player1: Please choose a role to play (c for color and d for dot)\n")
-player_one = str(role_select)
-
-if player_one.__eq__("c"):
-    role_one = "color"
-else:
-    role_one = "dot"
-print("Player 1, you are playing: " + role_one)
-if role_one.__eq__("color"):
-    role_two = "dot"
-else:
-    role_two = "color"
-print("Your counterpart(Player 2), will be playing: " + role_two)
-
-
 def toggle_player(player):
     if player == '1':
         return '2'
@@ -406,7 +348,6 @@ def put_board_card(card_num, row_num1, column_num1,row_num2, column_num2):
     dict_column[card_num] = column2
 
 
-
 def print_board_card():
     print()
     for item in board_card:
@@ -440,8 +381,22 @@ def get_type(half_type, row1, column1, row2, column2): #get the type according t
     if column1 == column2 and half_type == "WX":
             return 6
 
-# def validate_input(card_type, row1, colunm1):
-#     if validate_row(row1) and validate_column(column1)
+
+def is_card_type_valid(num):
+    if not is_int(num):
+        return False
+    elif int(num) < 1 or int(num) > 8:
+        return False
+    else:
+        return True
+
+
+def is_color_dot_valid(t):
+    if t == 'c' or t == 'd':
+        return True
+    else:
+        return False
+
 
 def is_state_valid(row1, column1, row2, column2):
     global board_visual
@@ -454,11 +409,62 @@ def is_state_valid(row1, column1, row2, column2):
     else:
         return False
 
+
 def is_recycle_valid(row1, column1, row2, column2):
     if board_visual[12-row1+1][column1] == '  ' or board_visual[12-row2+1][column2] == '  ':# check if both cells are occupied
         return False
     else:
-        return  True
+        return True
+
+
+def is_int(n):
+    try:
+        int(n)
+        return True
+    except ValueError:
+        return False
+
+
+def parse_row(card_row):
+    if not is_int(card_row):
+        return 0
+    else:
+        row = int(card_row)
+        if row < 1 or row > 12:
+            return 0
+        else:
+            return int(card_row)
+
+
+def print_card_type():
+    print()
+    print("1        2       3       4       5       6       7       8")
+    print("RX WO    RX      WO RX   WO      RO WX   RO      WX RO   WX")
+    print("         WO              RX              WX              RO")
+    print()
+
+
+def parse_colunm(card_column):
+    if card_column == "A":
+        return 1
+    elif card_column == "B":
+        return 2
+    elif card_column == "C":
+        return 3
+    elif card_column == "D":
+        return 4
+    elif card_column == "E":
+        return 5
+    elif card_column == "F":
+        return 6
+    elif card_column == "G":
+        return 7
+    elif card_column == "H":
+        return 8
+    else:
+        return 0
+
+
 step_counter = 0
 valid_card_position = False
 playerId = '2'
@@ -467,50 +473,79 @@ dict_row = {}
 dict_column = {}
 
 
+role_select = input("Player1: Please choose a role to play (c for color and d for dot)")
+while not is_color_dot_valid(role_select):
+    print("Your input is invalid, please input again:")
+    role_select = input("Player1: Please choose a role to play (c for color and d for dot)")
+
+player_one = role_select
+
+if player_one.__eq__("c"):
+    role_one = "color"
+else:
+    role_one = "dot"
+print("Player 1, you are playing: " + role_one)
+if role_one.__eq__("color"):
+    role_two = "dot"
+else:
+    role_two = "color"
+print("Your counterpart(Player 2), will be playing: " + role_two)
+
+
 while step_counter <= 60:
     while card_id <= 3: #put 3 for test, actural num is 23
         playerId = toggle_player(playerId)
-        Game.print_card_type()
+        print_card_type()
+        print_board()
 
-        card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
-        row1 = Game.parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+        card_type = input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:")
+        while not is_card_type_valid(card_type):
+            print("Your input is invalid, please input again:")
+            card_type = input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:")
+        card_type = int(card_type)
+
+        row1 = parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
         row2 = second_half_row(card_type, row1)
         column = input("Player " + playerId + ": Please choose your card column from A - H:")
-        column1 = Game.parse_colunm(column)
+        column1 = parse_colunm(column)
         column2 = second_half_column(card_type, column1)
-        while not is_state_valid():
+        while not is_state_valid(row1, column1, row2, column2):
+            print("Player " + playerId + ": your input is invalid, please input again.")
             card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
-            row1 = Game.parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+            row1 = parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
             row2 = second_half_row(card_type, row1)
             column = input("Player " + playerId + ": Please choose your card column from A - H:")
-            column1 = Game.parse_colunm(column)
+            column1 = parse_colunm(column)
             column2 = second_half_column(card_type, column1)
-            
+
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
         card_num = incre_card_id()
+
         place_half(half_name1, row1, column1)
         place_half(half_name2, row2, column2)
+
         print_board()
         put_board_card(card_num, row1, column1, row2, column2)
         print_board_card()
         step_counter = step_counter + 1
     while card_id > 3:
         playerId = toggle_player(playerId)
-        Game.print_card_type()
-        row1 = int(input("Player " + playerId + ": Please type the recycle card row:"))
+        print_card_type()
+        row1 = parse_row(input("Player " + playerId + ": Please type the recycle card row:"))
         column = input("Player " + playerId + ": Please type the recycle card column:")
-        column1 = Game.parse_colunm(column)
+        column1 = parse_colunm(column)
         recycle_card_id = board_card[12 - row1][column1]
         row2 = dict_row[recycle_card_id]
         column2 = dict_column[recycle_card_id]
+
         half_name1 = board_visual[12 - row1][column1]
         half_name2 = board_visual[12 - row2][column2]
         recycle_card(row1, column1, row2, column2)
         print_board()
-        row1 = Game.parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
+        row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
         column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
-        column1 = Game.parse_colunm(column)
+        column1 = parse_colunm(column)
         place_half(half_name1, row1, column1)
         row2 = second_half_row(card_type, row1)
         column2 = second_half_column(card_type, column1)
