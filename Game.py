@@ -2,6 +2,7 @@ import numpy as np
 from Card import *
 from Half import *
 import copy
+import sys
 
 board_visual = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
                 ['11', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
@@ -315,20 +316,28 @@ def first_half_name(card_typeid):
 def second_half_row(card_typeid, row_num):
     if card_typeid == 1 or card_typeid == 3 or card_typeid == 5 or card_typeid == 7:
         return row_num
+    row_num += 1
+    if row_num == 13:
+        return 0
     else:
-        return row_num + 1
+        return row_num
 
 
 def second_half_column(card_typeid, column_num):
     if card_typeid == 1 or card_typeid == 3 or card_typeid == 5 or card_typeid == 7:
-        return column_num + 1
+        column_num += 1
+    if column_num == 9:
+        return 0
     else:
         return column_num
 
 
-def place_half(type_str, row_num, column_num):
-    global board_visual
+def place_half(role, type_str, row_num, column_num):
+    global board_visual, game_over
     board_visual[12 - row_num][column_num] = type_str
+    if check_if_win(role, type_str, row_num, column_num):
+        print_board()
+        sys.exit([0])
 
 
 def incre_card_id():
@@ -398,20 +407,38 @@ def is_color_dot_valid(t):
         return False
 
 
-
 def is_state_valid(row1, column1, row2, column2):
     global board_visual
     if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
         return False
     if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
         return False
-    if board_visual[12-row1+1][column1] == '  ' or board_visual[12-row2+1][column2] == '  ':# check if both cells are occupied
-        return False
+    if abs(row1 - row2) == 1:
+        if board_visual[12 - row1 + 1][column1] == '  ':
+            return False
+        else:
+            return True
+    if abs(column1 - column2) == 1:
+        if board_visual[12 - row1 + 1][column1] == '  ' or board_visual[12 - row2 + 1][column2] == '  ':  # check if both cells are occupied
+            return False
+        else:
+            return True
     else:
         return True
 
 
-def is_recycle_valid(row1, column1, row2, column2):
+def is_recycle_valid(recycle_card_id, row1, column1):
+
+    if row1 == recent_row and column1 == recent_column:
+        print("This card just been moved/placed")
+        return False
+
+    if board_visual[12 - row1][column1] == '  ':
+        return False
+    row2 = dict_row[recycle_card_id]
+    column2 = dict_column[recycle_card_id]
+    if board_card[12 - row1][column1] != board_card[12 - row2][column2]:
+        return False
     try:
         if abs(row1-row2) == 1:
             if board_visual[12-row1-1][column1] != '  ' and board_visual[12-row2-1][column2] != '  ':# check if both cells are occupied
@@ -425,6 +452,7 @@ def is_recycle_valid(row1, column1, row2, column2):
                 return True
     except IndexError:  # means this card is at very bottom
         return True
+        return False
 
 
 def is_int(n):
@@ -475,22 +503,22 @@ def parse_colunm(card_column):
         return 0
 
 
-
 def check_if_win(role, type_str, row_num, column_num):
     half_color = type_str[0]
     half_dot = type_str[1]
     half_coordinate = [row_num, column_num]
     if role == "color":
         half1_color_map = check(half_color, half_coordinate)
-        if half1_color_map.__sizeof__() > 1:
+        if bool(half1_color_map):
             print("--------win with four ", half_color, " in line")
             return True
     if role == "dot":
         half1_dot_map = check(half_dot, half_coordinate)
-        if half1_dot_map.__sizeof__() > 1:
+        if bool(half1_dot_map):
             print("--------win with four ", half_dot, " in line")
             return True
     return False
+
 
 def check(role_token, coordinate):
     direction_map = {}
@@ -528,42 +556,42 @@ def check_in_direction_with_distance(direction, role_token, coordinate, distance
     while distance < 4:
         try:
             if direction == "t":
-                if role_token in board_card[12 - coordinate[0]-distance][coordinate[1]]:
+                if role_token in board_visual[12 - coordinate[0]-distance][coordinate[1]]:
                     num_in_line += 1
                 else:
                     break
             if direction == "tr":
-                if role_token in board_card[12 - coordinate[0]-distance][coordinate[1]+distance]:
+                if role_token in board_visual[12 - coordinate[0]-distance][coordinate[1]+distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "r":
-                if role_token in board_card[12 - coordinate[0]][coordinate[1]+distance]:
+                if role_token in board_visual[12 - coordinate[0]][coordinate[1]+distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "rb":
-                if role_token in board_card[12 - coordinate[0]+distance][coordinate[1]+distance]:
+                if role_token in board_visual[12 - coordinate[0]+distance][coordinate[1]+distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "b":
-                if role_token in board_card[12 - coordinate[0]+distance][coordinate[1]]:
+                if role_token in board_visual[12 - coordinate[0]+distance][coordinate[1]]:
                     num_in_line += 1
                 else:
                     break
             if direction == "bl":
-                if role_token in board_card[12 - coordinate[0]+distance][coordinate[1]-distance]:
+                if role_token in board_visual[12 - coordinate[0]+distance][coordinate[1]-distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "l":
-                if role_token in board_card[12 - coordinate[0]][coordinate[1]-distance]:
+                if role_token in board_visual[12 - coordinate[0]][coordinate[1]-distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "lt":
-                if role_token in board_card[12 - coordinate[0]-distance][coordinate[1]-distance]:
+                if role_token in board_visual[12 - coordinate[0]-distance][coordinate[1]-distance]:
                     num_in_line += 1
                 else:
                     break
@@ -579,6 +607,12 @@ playerId = '2'
 card_id = 0
 dict_row = {}
 dict_column = {}
+role_one = ""
+role_two = ""
+recent_row = 100
+recent_column = 100
+#recycle_id = board_card[12 - recycle_row][recycle_column]
+recycle_step = 2
 
 
 role_select = input("Player1: Please choose a role to play (c for color and d for dot)")
@@ -601,8 +635,12 @@ print("Your counterpart(Player 2), will be playing: " + role_two)
 
 
 while step_counter <= 60:
-    while card_id <= 3: #put 3 for test, actural num is 23
+    while card_id <= recycle_step:
         playerId = toggle_player(playerId)
+        if playerId == 1:
+            role = role_one
+        else:
+            role = role_two
         print_card_type()
         print_board()
 
@@ -630,23 +668,35 @@ while step_counter <= 60:
         half_name2 = second_half_name(card_type)
         card_num = incre_card_id()
 
-        place_half(half_name1, row1, column1)
-        place_half(half_name2, row2, column2)
+        place_half(role, half_name1, row1, column1)
+        place_half(role, half_name2, row2, column2)
+        recent_row = row1
+        recent_column = column1
 
         print_board()
         put_board_card(card_num, row1, column1, row2, column2)
         print_board_card()
         step_counter = step_counter + 1
-    while card_id > 3:
+    while card_id > recycle_step:
         playerId = toggle_player(playerId)
+        if playerId == 1:
+            role = role_one
+        else:
+            role = role_two
         print_card_type()
         row1 = parse_row(input("Player " + playerId + ": Please type the recycle card row:"))
         column = input("Player " + playerId + ": Please type the recycle card column:")
         column1 = parse_colunm(column)
         recycle_card_id = board_card[12 - row1][column1]
+        while not is_recycle_valid(recycle_card_id, row1, column1):
+            print("Player " + playerId + ":your input is invalid, please input again.")
+            row1 = parse_row(input("Player " + playerId + ": Please type the recycle card row:"))
+            column = input("Player " + playerId + ": Please type the recycle card column:")
+            column1 = parse_colunm(column)
+            recycle_card_id = board_card[12 - row1][column1]
+
         row2 = dict_row[recycle_card_id]
         column2 = dict_column[recycle_card_id]
-
         half_name1 = board_visual[12 - row1][column1]
         half_name2 = board_visual[12 - row2][column2]
         recycle_card(row1, column1, row2, column2)
@@ -654,10 +704,21 @@ while step_counter <= 60:
         row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
         column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
         column1 = parse_colunm(column)
-        place_half(half_name1, row1, column1)
         row2 = second_half_row(card_type, row1)
         column2 = second_half_column(card_type, column1)
-        place_half(half_name2, row2, column2)
+
+        while not is_state_valid(row1, column1, row2, column2):
+            print("Player " + playerId + ":your input is invalid, please input again.")
+            row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
+            column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
+            column1 = parse_colunm(column)
+            row2 = second_half_row(card_type, row1)
+            column2 = second_half_column(card_type, column1)
+
+        place_half(role, half_name1, row1, column1)
+        place_half(role, half_name2, row2, column2)
+        recent_row = row1
+        recent_column = column1
         print_board()
         put_board_card(recycle_card_id, row1, column1, row2, column2)
         print_board_card()
