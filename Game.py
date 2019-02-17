@@ -423,6 +423,30 @@ def is_state_valid(row1, column1, row2, column2):
         return True
 
 
+def is_recycle_state_valid(rotated, row1, column1, row2, column2):
+    if not rotated:
+        if row1 == toked_row and column1 == toked_column:
+            return False
+
+    global board_visual
+    if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
+        return False
+    if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
+        return False
+    if abs(row1 - row2) == 1:
+        if board_visual[12 - row1 + 1][column1] == '  ':
+            return False
+        else:
+            return True
+    if abs(column1 - column2) == 1:
+        if board_visual[12 - row1 + 1][column1] == '  ' or board_visual[12 - row2 + 1][column2] == '  ':  # check if both cells are occupied
+            return False
+        else:
+            return True
+    else:
+        return True
+
+
 def is_recycle_valid(recycle_card_id, row1, column1):
 
     if row1 == recent_row and column1 == recent_column:
@@ -603,10 +627,13 @@ playerId = '2'
 card_id = 0
 dict_row = {}
 dict_column = {}
+dict_card_type = {}
 role_one = ""
 role_two = ""
 recent_row = 100
 recent_column = 100
+toked_row = 100
+toked_column = 100
 #recycle_id = board_card[12 - recycle_row][recycle_column]
 recycle_step = 2
 
@@ -664,12 +691,15 @@ while step_counter <= 60:
         half_name2 = second_half_name(card_type)
         card_num = incre_card_id()
 
+        dict_card_type[card_num] = card_type
+
         place_half(role, half_name1, row1, column1)
         place_half(role, half_name2, row2, column2)
         recent_row = row1
         recent_column = column1
 
         put_board_card(card_num, row1, column1, row2, column2)
+        print_board()
         print_board_card()
         step_counter = step_counter + 1
     while card_id > recycle_step:
@@ -690,28 +720,56 @@ while step_counter <= 60:
             column1 = parse_colunm(column)
             recycle_card_id = board_card[12 - row1][column1]
 
+        toked_row = row1
+        toked_column = column1
         row2 = dict_row[recycle_card_id]
         column2 = dict_column[recycle_card_id]
         half_name1 = board_visual[12 - row1][column1]
         half_name2 = board_visual[12 - row2][column2]
         recycle_card(row1, column1, row2, column2)
         print_board()
+
+        card_type = input("Player " + playerId + ": Please choose the card type for recycle card, select a number from 1 - 8:")
+        while not is_card_type_valid(card_type):
+            print("Your input is invalid, please input again:")
+            card_type = input("Player " + playerId + ": Please choose the card type for recycle card, select a number from 1 - 8:")
+        card_type = int(card_type)
+        recycled_card_type = dict_card_type[recycle_card_id]
+        if card_type == recycled_card_type:
+            rotated = False
+        else:
+            rotated = True
+
         row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
         column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
         column1 = parse_colunm(column)
         row2 = second_half_row(card_type, row1)
         column2 = second_half_column(card_type, column1)
 
-        while not is_state_valid(row1, column1, row2, column2):
-            print("Player " + playerId + ":your input is invalid, please input again.")
-            row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
-            column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
-            column1 = parse_colunm(column)
+        # while not is_state_valid(row1, column1, row2, column2):
+        #     print("Player " + playerId + ":your input is invalid, please input again.")
+        #     row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
+        #     column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
+        #     column1 = parse_colunm(column)
+        #     row2 = second_half_row(card_type, row1)
+        #     column2 = second_half_column(card_type, column1)
+
+        while not is_recycle_state_valid(rotated, row1, column1, row2, column2):
+            print("Player " + playerId + ": your input is invalid, please input again.")
+            card_type = int(input("Player " + playerId + ": Please choose the card type for recycle card, select a number from 1 - 8:"))
+            row1 = parse_row(input("Player " + playerId + ": Please choose your recycle card row from 1 - 12:"))
             row2 = second_half_row(card_type, row1)
+            column = input("Player " + playerId + ": Please choose your recycle card column from A - H:")
+            column1 = parse_colunm(column)
             column2 = second_half_column(card_type, column1)
 
+        half_name1 = first_half_name(card_type)
+        half_name2 = second_half_name(card_type)
         place_half(role, half_name1, row1, column1)
         place_half(role, half_name2, row2, column2)
+
+        dict_card_type[recycle_card_id] = card_type
+
         recent_row = row1
         recent_column = column1
         print_board()
