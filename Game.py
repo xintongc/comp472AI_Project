@@ -669,7 +669,6 @@ while step_counter <= 60:
         recent_row = row1
         recent_column = column1
 
-        print_board()
         put_board_card(card_num, row1, column1, row2, column2)
         print_board_card()
         step_counter = step_counter + 1
