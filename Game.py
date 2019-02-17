@@ -1,7 +1,3 @@
-import numpy as np
-from Card import *
-from Half import *
-import copy
 import sys
 
 board_visual = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
