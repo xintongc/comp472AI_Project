@@ -34,14 +34,14 @@ class Game:
         self.turn = turn
         self.step_counter = 0
         self.card_counter = 0
-        self.board = np.empty((12, 8), Half) #initial state
+        self.board = np.empty((12, 8), Half)  # initial state
         self.board_visual = np.empty((12, 8), str)  # initial state
         self.card_type_list = self.initialize_cardtype()
         self.card_deck = []
 
-        self.current_turn_win = False #flag for win for current player
-        self.current_makes_illegal = False #flag for whether current player makes the state illegal
-        self.other_could_win = False #flag for checking if the card current player played will make the other win
+        self.current_turn_win = False  # flag for win for current player
+        self.current_makes_illegal = False  # flag for whether current player makes the state illegal
+        self.other_could_win = False  # flag for checking if the card current player played will make the other win
 
     def initialize_cardtype(self):
         h1 = Half("R", "X")
@@ -52,11 +52,11 @@ class Game:
 
         c1 = Card(1, copy.deepcopy(h1), copy.deepcopy(h4))
         c1.half1.position = "l"  # left
-        c1.half2.position = "r" #right
+        c1.half2.position = "r"  # right
 
         c2 = Card(2, copy.deepcopy(h1), copy.deepcopy(h4))
-        c2.half1.position = "t" #top
-        c2.half2.position = "b" #bottom
+        c2.half1.position = "t"  # top
+        c2.half2.position = "b"  # bottom
 
         c3 = Card(3, copy.deepcopy(h1), copy.deepcopy(h4))
         c3.half2.position = "l"  # left
@@ -110,7 +110,7 @@ class Game:
         coordinate = [card_row, x]
         if move_type == 0:
             card = copy.deepcopy(self.card_type_list[card_type_index])
-            card.set_cardId(len(self.card_deck)+1)
+            card.set_cardId(len(self.card_deck) + 1)
             self.play_card(card, coordinate)
 
     def toggle_turn(self):
@@ -217,42 +217,46 @@ class Game:
         while distance < 4:
             try:
                 if direction == "t":
-                    if self.board[12 - coordinate[0]+distance][coordinate[1]].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0] + distance][coordinate[1]].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "tr":
-                    if self.board[12 - coordinate[0]+distance][coordinate[1]+distance].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0] + distance][coordinate[1] + distance].match_with_role_token(
+                            role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "r":
-                    if self.board[12 - coordinate[0]][coordinate[1]+distance].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0]][coordinate[1] + distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "rb":
-                    if self.board[12 - coordinate[0]-distance][coordinate[1]+distance].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0] - distance][coordinate[1] + distance].match_with_role_token(
+                            role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "b":
-                    if self.board[12 - coordinate[0]-distance][coordinate[1]].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0] - distance][coordinate[1]].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "bl":
-                    if self.board[12 - coordinate[0]-distance][coordinate[1]-distance].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0] - distance][coordinate[1] - distance].match_with_role_token(
+                            role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "l":
-                    if self.board[12 - coordinate[0]][coordinate[1]-distance].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0]][coordinate[1] - distance].match_with_role_token(role_token):
                         num_in_line += 1
                     else:
                         break
                 if direction == "lt":
-                    if self.board[12 - coordinate[0]+distance][coordinate[1]-distance].match_with_role_token(role_token):
+                    if self.board[12 - coordinate[0] + distance][coordinate[1] - distance].match_with_role_token(
+                            role_token):
                         num_in_line += 1
                     else:
                         break
@@ -262,7 +266,9 @@ class Game:
                 break
         return num_in_line
 
-    #dummy function to help understand the game board
+    # dummy function to help understand the game board
+
+
 #     def myfunc(self):
 #         board = np.empty(12, 8)
 #         board[12-2][0] = "WO" #indicate A 2 --> coordinate [2,0]
@@ -273,6 +279,14 @@ class Game:
 # p1 = Game("John")
 #
 # p1.myfunc()
+
+
+def command_line_parser(cmd):
+    inputs = str(cmd).split(' ')
+    card_type = inputs[0]
+    card_column = parse_colunm(inputs[1])
+    card_row = parse_row(inputs[2])
+    return [card_type, card_column, card_row]
 
 
 def print_board():
@@ -346,10 +360,11 @@ def incre_card_id():
     return card_id_str
 
 
-def put_board_card(card_num, row_num1, column_num1,row_num2, column_num2):
+def put_board_card(card_num, row_num1, column_num1, row_num2, column_num2):
     board_card[12 - row_num1][column_num1] = card_num
     board_card[12 - row_num2][column_num2] = card_num
-    dict_row[card_num] = row_num2  #create 2 dictionary, we can find the other halfs position according to card_id, used for recycle
+    dict_row[
+        card_num] = row_num2  # create 2 dictionary, we can find the other halfs position according to card_id, used for recycle
     dict_column[card_num] = column2
 
 
@@ -362,13 +377,14 @@ def print_board_card():
 def recycle_card(row_num, column_num, row_num2, column_num2):
     global board_visual
     global board_card
-    board_visual[12 - row_num][column_num] = '  '#set the recycled card coordinate empty
+    board_visual[12 - row_num][column_num] = '  '  # set the recycled card coordinate empty
     board_visual[12 - row_num2][column_num2] = '  '
     board_card[12 - row_num][column_num] = '  '
     board_card[12 - row_num2][column_num2] = '  '
 
 
-def get_type(half_type, row1, column1, row2, column2): #get the type according to the relative position of the other half
+def get_type(half_type, row1, column1, row2,
+             column2):  # get the type according to the relative position of the other half
     if row1 == row2 and half_type == "RX":
         return 1
     if row1 == row2 and half_type == "WO":
@@ -382,9 +398,9 @@ def get_type(half_type, row1, column1, row2, column2): #get the type according t
     if column1 == column2 and half_type == "WO":
         return 2
     if column1 == column2 and half_type == "RO":
-            return 8
+        return 8
     if column1 == column2 and half_type == "WX":
-            return 6
+        return 6
 
 
 def is_card_type_valid(num):
@@ -407,7 +423,8 @@ def is_state_valid(row1, column1, row2, column2):
     global board_visual
     if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
         return False
-    if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
+    if board_visual[12 - row1][column1] != '  ' or board_visual[12 - row2][
+        column2] != '  ':  # check if both cells are occupied
         return False
     if abs(row1 - row2) == 1:
         if board_visual[12 - row1 + 1][column1] == '  ':
@@ -415,7 +432,8 @@ def is_state_valid(row1, column1, row2, column2):
         else:
             return True
     if abs(column1 - column2) == 1:
-        if board_visual[12 - row1 + 1][column1] == '  ' or board_visual[12 - row2 + 1][column2] == '  ':  # check if both cells are occupied
+        if board_visual[12 - row1 + 1][column1] == '  ' or board_visual[12 - row2 + 1][
+            column2] == '  ':  # check if both cells are occupied
             return False
         else:
             return True
@@ -431,7 +449,8 @@ def is_recycle_state_valid(rotated, row1, column1, row2, column2):
     global board_visual
     if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
         return False
-    if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
+    if board_visual[12 - row1][column1] != '  ' or board_visual[12 - row2][
+        column2] != '  ':  # check if both cells are occupied
         return False
     if abs(row1 - row2) == 1:
         if board_visual[12 - row1 + 1][column1] == '  ':
@@ -439,7 +458,8 @@ def is_recycle_state_valid(rotated, row1, column1, row2, column2):
         else:
             return True
     if abs(column1 - column2) == 1:
-        if board_visual[12 - row1 + 1][column1] == '  ' or board_visual[12 - row2 + 1][column2] == '  ':  # check if both cells are occupied
+        if board_visual[12 - row1 + 1][column1] == '  ' or board_visual[12 - row2 + 1][
+            column2] == '  ':  # check if both cells are occupied
             return False
         else:
             return True
@@ -448,7 +468,6 @@ def is_recycle_state_valid(rotated, row1, column1, row2, column2):
 
 
 def is_recycle_valid(recycle_card_id, row1, column1):
-
     if row1 == recent_row and column1 == recent_column:
         print("This card just been moved/placed")
         return False
@@ -460,13 +479,15 @@ def is_recycle_valid(recycle_card_id, row1, column1):
     if board_card[12 - row1][column1] != board_card[12 - row2][column2]:
         return False
     try:
-        if abs(row1-row2) == 1:
-            if board_visual[12-row1-1][column1] != '  ' and board_visual[12-row2-1][column2] != '  ':# check if both cells are occupied
+        if abs(row1 - row2) == 1:
+            if board_visual[12 - row1 - 1][column1] != '  ' and board_visual[12 - row2 - 1][
+                column2] != '  ':  # check if both cells are occupied
                 return False
             else:
                 return True
-        if abs(column1-column2) == 1:
-            if board_visual[12 - row1 - 1][column1] != '  ' or board_visual[12 - row2 - 1][column2] != '  ':  # check if both cells are occupied
+        if abs(column1 - column2) == 1:
+            if board_visual[12 - row1 - 1][column1] != '  ' or board_visual[12 - row2 - 1][
+                column2] != '  ':  # check if both cells are occupied
                 return False
             else:
                 return True
@@ -570,56 +591,58 @@ def check(role_token, coordinate):
         direction_map["lt"] = lt
         return direction_map
 
+
 def check_in_direction_with_distance(direction, role_token, coordinate, distance):
     global board_card
     num_in_line = 0
     while distance < 4:
         try:
             if direction == "t":
-                if role_token in board_visual[12 - coordinate[0]-distance][coordinate[1]]:
+                if role_token in board_visual[12 - coordinate[0] - distance][coordinate[1]]:
                     num_in_line += 1
                 else:
                     break
             if direction == "tr":
-                if role_token in board_visual[12 - coordinate[0]-distance][coordinate[1]+distance]:
+                if role_token in board_visual[12 - coordinate[0] - distance][coordinate[1] + distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "r":
-                if role_token in board_visual[12 - coordinate[0]][coordinate[1]+distance]:
+                if role_token in board_visual[12 - coordinate[0]][coordinate[1] + distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "rb":
-                if role_token in board_visual[12 - coordinate[0]+distance][coordinate[1]+distance]:
+                if role_token in board_visual[12 - coordinate[0] + distance][coordinate[1] + distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "b":
-                if role_token in board_visual[12 - coordinate[0]+distance][coordinate[1]]:
+                if role_token in board_visual[12 - coordinate[0] + distance][coordinate[1]]:
                     num_in_line += 1
                 else:
                     break
             if direction == "bl":
-                if role_token in board_visual[12 - coordinate[0]+distance][coordinate[1]-distance]:
+                if role_token in board_visual[12 - coordinate[0] + distance][coordinate[1] - distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "l":
-                if role_token in board_visual[12 - coordinate[0]][coordinate[1]-distance]:
+                if role_token in board_visual[12 - coordinate[0]][coordinate[1] - distance]:
                     num_in_line += 1
                 else:
                     break
             if direction == "lt":
-                if role_token in board_visual[12 - coordinate[0]-distance][coordinate[1]-distance]:
+                if role_token in board_visual[12 - coordinate[0] - distance][coordinate[1] - distance]:
                     num_in_line += 1
                 else:
                     break
             distance += 1
         except IndexError:  # means this card is at very bottom
-            #num_in_line += 0
+            # num_in_line += 0
             break
     return num_in_line
+
 
 step_counter = 0
 valid_card_position = False
@@ -634,14 +657,13 @@ recent_row = 100
 recent_column = 100
 toked_row = 100
 toked_column = 100
-#recycle_id = board_card[12 - recycle_row][recycle_column]
+# recycle_id = board_card[12 - recycle_row][recycle_column]
 recycle_step = 2
 
-
-role_select = input("Player1: Please choose a role to play (c for color and d for dot)")
+role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
 while not is_color_dot_valid(role_select):
     print("Your input is invalid, please input again:")
-    role_select = input("Player1: Please choose a role to play (c for color and d for dot)")
+    role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
 
 player_one = role_select
 
@@ -656,7 +678,6 @@ else:
     role_two = "color"
 print("Your counterpart(Player 2), will be playing: " + role_two)
 
-
 while step_counter <= 60:
     while card_id <= recycle_step:
         playerId = toggle_player(playerId)
@@ -667,24 +688,22 @@ while step_counter <= 60:
         print_card_type()
         print_board()
 
-        card_type = input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:")
-        while not is_card_type_valid(card_type):
-            print("Your input is invalid, please input again:")
-            card_type = input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:")
-        card_type = int(card_type)
-
-        row1 = parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+        inputText = input("Player " + playerId + ": Select a card and place it. (cardType, col, row):")
+        inputList = command_line_parser(inputText)
+        card_type = int(inputList[0])
+        row1 = inputList[2]
         row2 = second_half_row(card_type, row1)
-        column = input("Player " + playerId + ": Please choose your card column from A - H:")
-        column1 = parse_colunm(column)
+        column1 = inputList[1]
         column2 = second_half_column(card_type, column1)
-        while not is_state_valid(row1, column1, row2, column2):
-            print("Player " + playerId + ": your input is invalid, please input again.")
-            card_type = int(input("Player " + playerId + ": Please choose your card type, select a number from 1 - 8:"))
-            row1 = parse_row(input("Player " + playerId + ": Please choose your card row from 1 - 12:"))
+
+        while not is_card_type_valid(card_type) or not is_state_valid(row1, column1, row2, column2):
+            print("Your input is invalid, please input again:")
+            inputText = input("Player " + playerId + ": Select a card and place it. (cardType, col, row):")
+            inputList = command_line_parser(inputText)
+            card_type = int(inputList[0])
+            row1 = inputList[2]
             row2 = second_half_row(card_type, row1)
-            column = input("Player " + playerId + ": Please choose your card column from A - H:")
-            column1 = parse_colunm(column)
+            column1 = inputList[1]
             column2 = second_half_column(card_type, column1)
 
         half_name1 = first_half_name(card_type)
@@ -697,6 +716,7 @@ while step_counter <= 60:
         place_half(role, half_name2, row2, column2)
         recent_row = row1
         recent_column = column1
+        print("Last Card placed on col = " + str(recent_column) + " row = " + str(recent_row))
 
         put_board_card(card_num, row1, column1, row2, column2)
         print_board()
@@ -709,15 +729,17 @@ while step_counter <= 60:
         else:
             role = role_two
         print_card_type()
-        row1 = parse_row(input("Player " + playerId + ": Please type the recycle card row:"))
-        column = input("Player " + playerId + ": Please type the recycle card column:")
-        column1 = parse_colunm(column)
+        inputList = command_line_parser(
+            "X " + input("Player " + playerId + ": Please type the recycle card column and row(col row):"))
+        row1 = inputList[2]
+        column1 = inputList[1]
         recycle_card_id = board_card[12 - row1][column1]
         while not is_recycle_valid(recycle_card_id, row1, column1):
             print("Player " + playerId + ":your input is invalid, please input again.")
-            row1 = parse_row(input("Player " + playerId + ": Please type the recycle card row:"))
-            column = input("Player " + playerId + ": Please type the recycle card column:")
-            column1 = parse_colunm(column)
+            inputList = command_line_parser(
+                "X " + input("Player " + playerId + ": Please type the recycle card column and row(col row):"))
+            row1 = inputList[2]
+            column1 = inputList[1]
             recycle_card_id = board_card[12 - row1][column1]
 
         toked_row = row1
@@ -729,22 +751,35 @@ while step_counter <= 60:
         recycle_card(row1, column1, row2, column2)
         print_board()
 
-        card_type = input("Player " + playerId + ": Please choose the card type for recycle card, select a number from 1 - 8:")
-        while not is_card_type_valid(card_type):
-            print("Your input is invalid, please input again:")
-            card_type = input("Player " + playerId + ": Please choose the card type for recycle card, select a number from 1 - 8:")
-        card_type = int(card_type)
-        recycled_card_type = dict_card_type[recycle_card_id]
-        if card_type == recycled_card_type:
-            rotated = False
-        else:
-            rotated = True
-
-        row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
-        column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
-        column1 = parse_colunm(column)
+        inputList = command_line_parser(
+            input("Player " + playerId + ": Select a card type for recycle card and place it. (cardType, col, row):"))
+        card_type = int(inputList[0])
+        row1 = inputList[2]
         row2 = second_half_row(card_type, row1)
+        column1 = inputList[1]
         column2 = second_half_column(card_type, column1)
+
+        isRecycleInputValid = False
+
+        while not isRecycleInputValid:
+            recycled_card_type = dict_card_type[recycle_card_id]
+            if card_type == recycled_card_type:
+                rotated = False
+            else:
+                rotated = True
+
+            if not is_card_type_valid(card_type) or not is_recycle_state_valid(rotated, row1, column1, row2, column2):
+                print("Player " + playerId + ": your input is invalid, please input again.")
+                inputList = command_line_parser(
+                    input(
+                        "Player " + playerId + ": Select a card type for recycle card and place it. (cardType, col, row):"))
+                card_type = int(inputList[0])
+                row1 = inputList[2]
+                row2 = second_half_row(card_type, row1)
+                column1 = inputList[1]
+                column2 = second_half_column(card_type, column1)
+            else:
+                isRecycleInputValid = True
 
         # while not is_state_valid(row1, column1, row2, column2):
         #     print("Player " + playerId + ":your input is invalid, please input again.")
@@ -753,15 +788,6 @@ while step_counter <= 60:
         #     column1 = parse_colunm(column)
         #     row2 = second_half_row(card_type, row1)
         #     column2 = second_half_column(card_type, column1)
-
-        while not is_recycle_state_valid(rotated, row1, column1, row2, column2):
-            print("Player " + playerId + ": your input is invalid, please input again.")
-            card_type = int(input("Player " + playerId + ": Please choose the card type for recycle card, select a number from 1 - 8:"))
-            row1 = parse_row(input("Player " + playerId + ": Please choose your recycle card row from 1 - 12:"))
-            row2 = second_half_row(card_type, row1)
-            column = input("Player " + playerId + ": Please choose your recycle card column from A - H:")
-            column1 = parse_colunm(column)
-            column2 = second_half_column(card_type, column1)
 
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
@@ -775,9 +801,3 @@ while step_counter <= 60:
         print_board()
         put_board_card(recycle_card_id, row1, column1, row2, column2)
         print_board_card()
-
-
-
-
-
-
