@@ -644,6 +644,43 @@ def check_in_direction_with_distance(direction, role_token, coordinate, distance
     return num_in_line
 
 
+def card_type_coordinates_association_map():
+    result = {}
+    row1, column1 = 1, 1
+    while column1 < 9:
+        while row1 < 12:
+            if board_card[12-row1][column1] == '  ':
+                card_type = 1
+                row2 = second_half_row(card_type, row1)
+                column2 = second_half_column(card_type, column1)
+                if board_card[12-row2][column2] == '  ':
+                    if is_state_valid(row1, column1, row2, column2):
+                        while card_type < 9:
+                            cmd = str(card_type) + " " + str(column1) + " " + str(row1)
+                            if not result.get(card_type):
+                                result.__setitem__(card_type, [cmd])
+                            else:
+                                result.get(card_type).append(cmd)
+                            card_type += 2
+                card_type = 2
+                row2 = second_half_row(card_type, row1)
+                column2 = second_half_column(card_type, column1)
+                if board_card[12 - row2][column2] == '  ':
+                    if is_state_valid(row1, column1, row2, column2):
+                        while card_type < 9:
+                            cmd = str(card_type) + " " + str(column1) + " " + str(row1)
+                            if not result.get(card_type):
+                                result.__setitem__(card_type, [cmd])
+                            else:
+                                result.get(card_type).append(cmd)
+                            card_type += 2
+                break
+            else:
+                row1 += 1
+        column1 += 1
+    return result
+
+
 step_counter = 0
 valid_card_position = False
 playerId = '2'
