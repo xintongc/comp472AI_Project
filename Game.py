@@ -683,8 +683,18 @@ def card_type_coordinates_association_map():
 
 
 def generate_tracking_file(map):
-    return 0
+    with open('tracemm.txt', 'r+') as f:
+        f.writelines(len(map.get('level3')))
+        f.writelines(map.get('level1')[0])
+        f.writelines('\n')
+        for num in map.get('level2'):
+            f.writelines(num)
+        f.writelines('\n')
+        f.close()
 
+
+def run_min_max():
+    return 'cmd'
 
 
 def evaluate(board, cmd): #board has two additional card, try to place the third card with cmd
