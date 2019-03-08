@@ -648,6 +648,7 @@ def card_type_coordinates_association_map():
     result = {}
     row1, column1 = 1, 1
     while column1 < 9:
+        row1 = 1
         while row1 < 12:
             if board_card[12-row1][column1] == '  ':
                 card_type = 1
@@ -679,6 +680,15 @@ def card_type_coordinates_association_map():
                 row1 += 1
         column1 += 1
     return result
+
+
+def generate_tracking_file(map):
+    return 0
+
+
+
+def evaluate(board, cmd): #board has two additional card, try to place the third card with cmd
+    return 0
 
 
 step_counter = 0
