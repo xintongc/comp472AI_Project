@@ -693,19 +693,19 @@ def card_type_coordinates_association_dict():
     return result
 
 
-def generate_tracking_file(map):
+def generate_tracking_file(dict):
     with open('tracemm.txt', 'a') as f:
-        f.writelines(len(map.get('level3')))
-        f.writelines(map.get('level1')[0])
+        f.writelines(dict.get('e_counter'))
+        f.writelines(dict.get('level1')[0])
         f.writelines('\n')
-        for num in map.get('level2'):
+        for num in dict.get('level2'):
             f.writelines(num)
         f.writelines('\n')
         f.close()
 
 
 def run_min_max():
-    global board_visual
+    global board_visual, isFileGenEnabled
     e_counter = 0
     minmax_trace = {'level1': [], 'level2': [], 'level3': [], "e_counter": e_counter}
     dict_level_1 = card_type_coordinates_association_dict()
@@ -756,6 +756,10 @@ def run_min_max():
                 final_cmd = cmd_1
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.get('e_counter').append(e_counter)
+
+    if isFileGenEnabled:
+        generate_tracking_file(minmax_trace)
+
     return final_cmd
 
 
@@ -778,6 +782,7 @@ toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
 recycle_step = 2
+isFileGenEnabled = False
 
 role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
 while not is_color_dot_valid(role_select):
