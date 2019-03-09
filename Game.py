@@ -1,4 +1,5 @@
 import sys
+import random
 
 board_visual = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
                 ['11', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
@@ -27,258 +28,6 @@ board_card = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
               ['02', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
               ['01', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
               ['  ', 'A ', 'B ', 'C ', 'D ', 'E ', 'F ', 'G ', 'H ']]
-
-
-class Game:
-    def __init__(self, turn):
-        self.turn = turn
-        self.step_counter = 0
-        self.card_counter = 0
-        self.board = np.empty((12, 8), Half)  # initial state
-        self.board_visual = np.empty((12, 8), str)  # initial state
-        self.card_type_list = self.initialize_cardtype()
-        self.card_deck = []
-
-        self.current_turn_win = False  # flag for win for current player
-        self.current_makes_illegal = False  # flag for whether current player makes the state illegal
-        self.other_could_win = False  # flag for checking if the card current player played will make the other win
-
-    def initialize_cardtype(self):
-        h1 = Half("R", "X")
-        h2 = Half("R", "O")
-
-        h3 = Half("W", "X")
-        h4 = Half("W", "O")
-
-        c1 = Card(1, copy.deepcopy(h1), copy.deepcopy(h4))
-        c1.half1.position = "l"  # left
-        c1.half2.position = "r"  # right
-
-        c2 = Card(2, copy.deepcopy(h1), copy.deepcopy(h4))
-        c2.half1.position = "t"  # top
-        c2.half2.position = "b"  # bottom
-
-        c3 = Card(3, copy.deepcopy(h1), copy.deepcopy(h4))
-        c3.half2.position = "l"  # left
-        c3.half1.position = "r"  # right
-
-        c4 = Card(4, copy.deepcopy(h1), copy.deepcopy(h4))
-        c4.half2.position = "t"  # top
-        c4.half1.position = "b"  # bottom
-
-        c5 = Card(5, copy.deepcopy(h2), copy.deepcopy(h3))
-        c5.half1.position = "l"  # left
-        c5.half2.position = "r"  # right
-
-        c6 = Card(6, copy.deepcopy(h2), copy.deepcopy(h3))
-        c6.half1.position = "t"  # top
-        c6.half2.position = "b"  # bottom
-
-        c7 = Card(7, copy.deepcopy(h2), copy.deepcopy(h3))
-        c7.half2.position = "l"  # left
-        c7.half1.position = "r"  # right
-
-        c8 = Card(8, copy.deepcopy(h2), copy.deepcopy(h3))
-        c8.half2.position = "t"  # top
-        c8.half1.position = "b"  # bottom
-
-        card_type_list = [c1, c2, c3, c4, c5, c6, c7, c8]
-        return card_type_list
-
-    def command_line_parser(self, cmd):
-        inputs = str(cmd).split(' ')
-        move_type = inputs[0]
-        card_type_index = inputs[1] - 1;
-        card_column = inputs[2]
-        card_row = inputs[3]
-        if card_column == "A":
-            x = 0
-        elif card_column == "B":
-            x = 1
-        elif card_column == "C":
-            x = 2
-        elif card_column == "D":
-            x = 3
-        elif card_column == "E":
-            x = 4
-        elif card_column == "F":
-            x = 5
-        elif card_column == "G":
-            x = 6
-        else:
-            x = 7
-        coordinate = [card_row, x]
-        if move_type == 0:
-            card = copy.deepcopy(self.card_type_list[card_type_index])
-            card.set_cardId(len(self.card_deck) + 1)
-            self.play_card(card, coordinate)
-
-    def toggle_turn(self):
-        if self.turn == "color":
-            self.turn = "dot"
-        else:
-            self.turn = "color"
-
-    def other_role(self):
-        if self.turn == "color":
-            return "dot"
-        else:
-            return "color"
-
-    def current_role(self):
-        if self.turn == "color":
-            return "color"
-        else:
-            return "dot"
-
-    def reset_flags(self):
-        self.current_turn_win = False;  # flag for win for current player
-        self.current_makes_illegal = False;  # flag for whether current player makes the state illegal
-        self.other_could_win = False;  # flag for checking if the card current player played will make the other win
-
-    def print_current_game_board_state(self):
-        print("The game board is \n")
-        print(self.board_visual)
-        print("The card deck is \n")
-        print(self.card_deck)
-
-    #
-    # def is_state_valid(self, row1, column1, row2, column2):
-    #     global board_visual
-    #     self.reset_flags()
-    #     if row1 == 0 or row2 == 0 or column1 == 0 or column2 == 0:  # check if half2 could be fit into the board, if yes, set both halfs coordinate
-    #         return False
-    #     if board_visual[12-row1][column1] != '  ' or board_visual[12-row2][column2] != '  ':# check if both cells are occupied
-    #         return False
-    #     if board_visual[12-row1-1][column1] == '  ' or board_visual[12-row2-1][column2] == '  ':# check if both cells are occupied
-    #         return False
-    #     else:
-    #         return False
-
-    def check_if_win(self, role, card):
-        half1_color = card.get_half1_color()
-        half1_dot = card.get_half1_dot()
-        half1_coordinate = card.get_half1_coordinate()
-        half2_color = card.get_half2_color()
-        half2_dot = card.get_half2_dot()
-        half2_coordinate = card.get_half2_coordinate()
-        if role == "color":
-            half1_color_map = self.check(half1_color, half1_coordinate)
-            if half1_color_map.__sizeof__() > 1:
-                print("--------win with four ", half1_color, " in line")
-                return True
-            half2_color_map = self.check(half2_color, half2_coordinate)
-            if half2_color_map.__sizeof__() > 1:
-                print("--------win with four ", half2_color, " in line")
-                return True
-        if role == "dot":
-            half1_dot_map = self.check(half1_dot, half1_coordinate)
-            if half1_dot_map.__sizeof__() > 1:
-                print("--------win with four ", half1_dot, " in line")
-                return True
-            half2_dot_map = self.check(half2_dot, half2_coordinate)
-            if half2_dot_map.__sizeof__() > 1:
-                print("--------win with four ", half2_dot, " in line")
-                return True
-        return False
-
-    def check(self, role_token, coordinate):
-        direction_map = {}
-        t = self.check_in_direction_with_distance("t", role_token, coordinate, 1)
-        b = self.check_in_direction_with_distance("b", role_token, coordinate, 1)
-        if t + b >= 3:
-            direction_map["t"] = t
-            direction_map["b"] = b
-            return direction_map
-
-        tr = self.check_in_direction_with_distance("tr", role_token, coordinate, 1)
-        bl = self.check_in_direction_with_distance("bl", role_token, coordinate, 1)
-        if tr + bl >= 3:
-            direction_map["tr"] = tr
-            direction_map["bl"] = bl
-            return direction_map
-
-        r = self.check_in_direction_with_distance("r", role_token, coordinate, 1)
-        l = self.check_in_direction_with_distance("l", role_token, coordinate, 1)
-        if r + l >= 3:
-            direction_map["r"] = r
-            direction_map["l"] = l
-            return direction_map
-
-        rb = self.check_in_direction_with_distance("rb", role_token, coordinate, 1)
-        lt = self.check_in_direction_with_distance("lt", role_token, coordinate, 1)
-        if lt + rb >= 3:
-            direction_map["rb"] = rb
-            direction_map["lt"] = lt
-            return direction_map
-
-    def check_in_direction_with_distance(self, direction, role_token, coordinate, distance):
-        num_in_line = 0
-        while distance < 4:
-            try:
-                if direction == "t":
-                    if self.board[12 - coordinate[0] + distance][coordinate[1]].match_with_role_token(role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "tr":
-                    if self.board[12 - coordinate[0] + distance][coordinate[1] + distance].match_with_role_token(
-                            role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "r":
-                    if self.board[12 - coordinate[0]][coordinate[1] + distance].match_with_role_token(role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "rb":
-                    if self.board[12 - coordinate[0] - distance][coordinate[1] + distance].match_with_role_token(
-                            role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "b":
-                    if self.board[12 - coordinate[0] - distance][coordinate[1]].match_with_role_token(role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "bl":
-                    if self.board[12 - coordinate[0] - distance][coordinate[1] - distance].match_with_role_token(
-                            role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "l":
-                    if self.board[12 - coordinate[0]][coordinate[1] - distance].match_with_role_token(role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                if direction == "lt":
-                    if self.board[12 - coordinate[0] + distance][coordinate[1] - distance].match_with_role_token(
-                            role_token):
-                        num_in_line += 1
-                    else:
-                        break
-                distance += 1
-            except IndexError:  # means this card is at very bottom
-                num_in_line += 0
-                break
-        return num_in_line
-
-    # dummy function to help understand the game board
-
-
-#     def myfunc(self):
-#         board = np.empty(12, 8)
-#         board[12-2][0] = "WO" #indicate A 2 --> coordinate [2,0]
-#         board[12-6][4] = "RX" # meaning place card position 8 on [row = 6, column=4]
-#         print(board)
-#
-#
-# p1 = Game("John")
-#
-# p1.myfunc()
 
 
 def command_line_parser(cmd):
@@ -811,23 +560,45 @@ recycle_step = 2
 isFileGenEnabled = False
 
 
-role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
-while not is_color_dot_valid(role_select):
-    print("Your input is invalid, please input again:")
+
+
+print("AI is deciding it plays the as 1st Player or 2nd Player:....")
+ai_player_num = random.randint(1, 3)
+human_player_num = 0
+if ai_player_num == 1:
+    human_player_num = 2
+else:
+    human_player_num = 1
+print("AI chooses to be Player " + ai_player_num)
+print('Human is Player ' + human_player_num)
+
+
+ai_player_role = ''
+human_player_role = ''
+if ai_player_num == 1:
+    print("AI is deciding which role to play (color or dot):......")
+    i = random.randint(1, 3)
+    if i == 1:
+        ai_player_role = 'color'
+        human_player_row = 'dot'
+        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_row)
+    else:
+        ai_player_role = 'dot'
+        human_player_row = 'color'
+        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_row)
+else:
     role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
-
-player_one = role_select
-
-if player_one.__eq__("c"):
-    role_one = "color"
-else:
-    role_one = "dot"
-print("Player 1, you are playing: " + role_one)
-if role_one.__eq__("color"):
-    role_two = "dot"
-else:
-    role_two = "color"
-print("Your counterpart(Player 2), will be playing: " + role_two)
+    while not is_color_dot_valid(role_select):
+        print("Your input is invalid, please input again:")
+        role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
+    if role_select == 'c':
+        ai_player_role = 'dot'
+        human_player_row = 'color'
+        print('Player1 plays ' + human_player_row + " Player2 plays " + ai_player_role)
+    else:
+        ai_player_role = 'color'
+        human_player_row = 'dot'
+        print('Player1 plays ' + human_player_row + " Player2 plays " + ai_player_role)
 
 while step_counter <= 60:
     while card_id <= recycle_step:
