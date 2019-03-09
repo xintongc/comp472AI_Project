@@ -455,11 +455,8 @@ def find_recyclable_card_nums():
                     row2 = dict_row[card_num]
                     column2 = dict_column[card_num]
                     if row1 != row2 and column1 != column2:
-                        if row1 != recent_row and column1 != recent_column:
-                            if is_recycle_valid(card_num, row1, column2):
-                                result.append([card_num, row1, column1, row2, column2])
-                        else:
-                            continue
+                        if is_recycle_valid(card_num, row1, column2):
+                            result.append([card_num, row1, column1, row2, column2])
                     else:
                         continue
             else:
@@ -479,7 +476,7 @@ def generate_tracking_file(dict):
         f.close()
 
 
-def run_min_max():
+def run_min_max(role):
     global board_visual, isFileGenEnabled
     e_counter = 0
     minmax_trace = {'level1': [], 'level2': [], 'level3': [], "e_counter": e_counter}
@@ -516,7 +513,7 @@ def run_min_max():
                     max_value = float(-10000000.0)
                     for card_type_3, cmds_3 in dict_level_3:
                         for cmd_3 in cmds_3:
-                            e = float("{:.1f}".format(evaluate(board_visual, cmd_3)))
+                            e = float("{:.1f}".format(evaluate(role, cmd_3)))
                             e_counter += 1
                             if e > max_value:
                                 max_value = e
@@ -826,12 +823,12 @@ if ai_player_num == 1:
     i = random.randint(1, 3)
     if i == 1:
         ai_player_role = 'color'
-        human_player_row = 'dot'
-        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_row)
+        human_player_role = 'dot'
+        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_role)
     else:
         ai_player_role = 'dot'
-        human_player_row = 'color'
-        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_row)
+        human_player_role = 'color'
+        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_role)
 else:
     role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
     while not is_color_dot_valid(role_select):
@@ -839,33 +836,22 @@ else:
         role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
     if role_select == 'c':
         ai_player_role = 'dot'
-        human_player_row = 'color'
-        print('Player1 plays ' + human_player_row + " Player2 plays " + ai_player_role)
+        human_player_role = 'color'
+        print('Player1 plays ' + human_player_role + " Player2 plays " + ai_player_role)
     else:
         ai_player_role = 'color'
-        human_player_row = 'dot'
-        print('Player1 plays ' + human_player_row + " Player2 plays " + ai_player_role)
+        human_player_role = 'dot'
+        print('Player1 plays ' + human_player_role + " Player2 plays " + ai_player_role)
 
 while step_counter <= 60:
     while card_id <= recycle_step:
         playerId = toggle_player(playerId)
-        if playerId == 1:
-            role = role_one
-        else:
-            role = role_two
+
         print_card_type()
         print_board()
 
-        inputText = input("Player " + playerId + ": Select a card and place it. (cardType, col, row):")
-        inputList = command_line_parser(inputText)
-        card_type = int(inputList[0])
-        row1 = inputList[2]
-        row2 = second_half_row(card_type, row1)
-        column1 = inputList[1]
-        column2 = second_half_column(card_type, column1)
-
-        while not is_card_type_valid(card_type) or not is_state_valid(row1, column1, row2, column2):
-            print("Your input is invalid, please input again:")
+        if playerId == human_player_num:
+            role = human_player_role
             inputText = input("Player " + playerId + ": Select a card and place it. (cardType, col, row):")
             inputList = command_line_parser(inputText)
             card_type = int(inputList[0])
@@ -873,6 +859,26 @@ while step_counter <= 60:
             row2 = second_half_row(card_type, row1)
             column1 = inputList[1]
             column2 = second_half_column(card_type, column1)
+            while not is_card_type_valid(card_type) or not is_state_valid(row1, column1, row2, column2):
+                print("Your input is invalid, please input again:")
+                inputText = input("Player " + playerId + ": Select a card and place it. (cardType, col, row):")
+                inputList = command_line_parser(inputText)
+                card_type = int(inputList[0])
+                row1 = inputList[2]
+                row2 = second_half_row(card_type, row1)
+                column1 = inputList[1]
+                column2 = second_half_column(card_type, column1)
+
+        if playerId == ai_player_num:
+            role = ai_player_role
+            cmd = run_min_max(role)
+            inputList = command_line_parser(cmd)
+            card_type = int(inputList[0])
+            row1 = inputList[2]
+            row2 = second_half_row(card_type, row1)
+            column1 = inputList[1]
+            column2 = second_half_column(card_type, column1)
+
 
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
@@ -892,70 +898,95 @@ while step_counter <= 60:
         step_counter = step_counter + 1
     while card_id > recycle_step:
         playerId = toggle_player(playerId)
-        if playerId == 1:
-            role = role_one
-        else:
-            role = role_two
+
         print_card_type()
-        inputList = command_line_parser(
-            "X " + input("Player " + playerId + ": Please type the recycle card column and row(col row):"))
-        row1 = inputList[2]
-        column1 = inputList[1]
-        recycle_card_id = board_card[12 - row1][column1]
-        while not is_recycle_valid(recycle_card_id, row1, column1):
-            print("Player " + playerId + ":your input is invalid, please input again.")
+
+        if playerId == human_player_num:
+            role = human_player_role
             inputList = command_line_parser(
                 "X " + input("Player " + playerId + ": Please type the recycle card column and row(col row):"))
             row1 = inputList[2]
             column1 = inputList[1]
             recycle_card_id = board_card[12 - row1][column1]
-
-        toked_row = row1
-        toked_column = column1
-        row2 = dict_row[recycle_card_id]
-        column2 = dict_column[recycle_card_id]
-        half_name1 = board_visual[12 - row1][column1]
-        half_name2 = board_visual[12 - row2][column2]
-        recycle_card(row1, column1, row2, column2)
-        print_board()
-
-        inputList = command_line_parser(
-            input("Player " + playerId + ": Select a card type for recycle card and place it. (cardType, col, row):"))
-        card_type = int(inputList[0])
-        row1 = inputList[2]
-        row2 = second_half_row(card_type, row1)
-        column1 = inputList[1]
-        column2 = second_half_column(card_type, column1)
-
-        isRecycleInputValid = False
-
-        while not isRecycleInputValid:
-            recycled_card_type = dict_card_type[recycle_card_id]
-            if card_type == recycled_card_type:
-                rotated = False
-            else:
-                rotated = True
-
-            if not is_card_type_valid(card_type) or not is_recycle_state_valid(rotated, row1, column1, row2, column2):
-                print("Player " + playerId + ": your input is invalid, please input again.")
+            while not is_recycle_valid(recycle_card_id, row1, column1):
+                print("Player " + playerId + ":your input is invalid, please input again.")
                 inputList = command_line_parser(
-                    input(
-                        "Player " + playerId + ": Select a card type for recycle card and place it. (cardType, col, row):"))
-                card_type = int(inputList[0])
+                    "X " + input("Player " + playerId + ": Please type the recycle card column and row(col row):"))
                 row1 = inputList[2]
-                row2 = second_half_row(card_type, row1)
                 column1 = inputList[1]
-                column2 = second_half_column(card_type, column1)
-            else:
-                isRecycleInputValid = True
+                recycle_card_id = board_card[12 - row1][column1]
 
-        # while not is_state_valid(row1, column1, row2, column2):
-        #     print("Player " + playerId + ":your input is invalid, please input again.")
-        #     row1 = parse_row(input("Player " + playerId + ": Please type the row you want to put the recycle card:"))
-        #     column = input("Player " + playerId + ": Please type the column you want to put the recycle card:")
-        #     column1 = parse_colunm(column)
-        #     row2 = second_half_row(card_type, row1)
-        #     column2 = second_half_column(card_type, column1)
+            toked_row = row1
+            toked_column = column1
+            row2 = dict_row[recycle_card_id]
+            column2 = dict_column[recycle_card_id]
+            half_name1 = board_visual[12 - row1][column1]
+            half_name2 = board_visual[12 - row2][column2]
+            recycle_card(row1, column1, row2, column2)
+            print_board()
+
+            inputList = command_line_parser(
+                input(
+                    "Player " + playerId + ": Select a card type for recycle card and place it. (cardType, col, row):"))
+            card_type = int(inputList[0])
+            row1 = inputList[2]
+            row2 = second_half_row(card_type, row1)
+            column1 = inputList[1]
+            column2 = second_half_column(card_type, column1)
+
+            isRecycleInputValid = False
+
+            while not isRecycleInputValid:
+                recycled_card_type = dict_card_type[recycle_card_id]
+                if card_type == recycled_card_type:
+                    rotated = False
+                else:
+                    rotated = True
+
+                if not is_card_type_valid(card_type) or not is_recycle_state_valid(rotated, row1, column1, row2,
+                                                                                   column2):
+                    print("Player " + playerId + ": your input is invalid, please input again.")
+                    inputList = command_line_parser(
+                        input(
+                            "Player " + playerId + ": Select a card type for recycle card and place it. (cardType, col, row):"))
+                    card_type = int(inputList[0])
+                    row1 = inputList[2]
+                    row2 = second_half_row(card_type, row1)
+                    column1 = inputList[1]
+                    column2 = second_half_column(card_type, column1)
+                else:
+                    isRecycleInputValid = True
+        if playerId == ai_player_num:
+            role = ai_player_role
+            recyclable_cards = find_recyclable_card_nums()
+            min_en = float(1000000000.0)
+            selected_card =''
+            for card in recyclable_cards:
+                card_type = card[0]
+                row1 = card[1]
+                column1 = card[2]
+                cmd = card_type + " " + row1 + " " + column1;
+                e = evaluate(role, cmd)
+                if e < min_en:
+                    min_en = e
+                    selected_card = card
+            recycled_card_type = selected_card[0]
+            row1 = selected_card[1]
+            column1 = selected_card[2]
+            row2 = selected_card[3]
+            column2 = selected_card[4]
+            recycle_card(row1, column1, row2, column2)
+
+            cmd = run_min_max(role)
+
+            inputList = command_line_parser(cmd)
+            card_type = int(inputList[0])
+            row1 = inputList[2]
+            row2 = second_half_row(card_type, row1)
+            column1 = inputList[1]
+            column2 = second_half_column(card_type, column1)
+
+
 
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
