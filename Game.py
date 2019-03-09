@@ -691,45 +691,45 @@ def depth(role_token, row, column):
 def empty_cell(role_token, row, column, depth_num):
     global board_visual
     coordinate = [row, column]
-    number = 0;
+    number = 0
     try:
         if board_visual[12 - coordinate[0] - depth_num[0]][coordinate[1]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0] - depth_num[2]][coordinate[1] + depth_num[2]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0]][coordinate[1] + - depth_num[4]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0] + depth_num[6]][coordinate[1] + depth_num[6]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0] + depth_num[1]][coordinate[1]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0] + depth_num[3]][coordinate[1] - depth_num[3]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0]][coordinate[1] - depth_num[5]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     try:
         if board_visual[12 - coordinate[0] - depth_num[7]][coordinate[1] - depth_num[7]] == '  ':
-            ++number
+            number += 1
     except IndexError:
         number += 0
     return number
