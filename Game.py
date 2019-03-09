@@ -693,6 +693,32 @@ def card_type_coordinates_association_dict():
     return result
 
 
+def find_recyclable_card_nums():
+    global board_card
+    result = []
+    row1, column1 = 12, 1
+    while column1 < 9:
+        row1 = 12
+        while row1 > 0:
+            if board_card[12 - row1][column1] != '  ':
+                card_num = board_card[12 - row1][column1]
+                if card_num not in result:
+                    row2 = dict_row[card_num]
+                    column2 = dict_column[card_num]
+                    if row1 != row2 and column1 != column2:
+                        if row1 != recent_row and column1 != recent_column:
+                            if is_recycle_valid(card_num, row1, column2):
+                                result.append([card_num, row1, column1, row2, column2])
+                        else:
+                            continue
+                    else:
+                        continue
+            else:
+                row1 -= 1
+        column1 += 1
+    return result
+
+
 def generate_tracking_file(dict):
     with open('tracemm.txt', 'a') as f:
         f.writelines(dict.get('e_counter'))
@@ -724,7 +750,7 @@ def run_min_max():
             place_temp_half(half_name2_1, row2_1, column2_1)
 
             dict_level_2 = card_type_coordinates_association_dict()
-            min_value = float(1000000000000.0)
+            min_value = float(10000000.0)
             for card_type_2, cmds_2 in dict_level_2:
                 for cmd_2 in cmds_2:
                     inputList_2 = command_line_parser(cmd_2)
@@ -738,7 +764,7 @@ def run_min_max():
                     place_temp_half(half_name2_2, row2_2, column2_2)
 
                     dict_level_3 = card_type_coordinates_association_dict()
-                    max_value = float(-10000000000.0)
+                    max_value = float(-10000000.0)
                     for card_type_3, cmds_3 in dict_level_3:
                         for cmd_3 in cmds_3:
                             e = float("{:.1f}".format(evaluate(board_visual, cmd_3)))
@@ -783,6 +809,7 @@ toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
 recycle_step = 2
 isFileGenEnabled = False
+
 
 role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
 while not is_color_dot_valid(role_select):
@@ -922,6 +949,7 @@ while step_counter <= 60:
 
         recent_row = row1
         recent_column = column1
+        print("Last Card placed on col = " + str(recent_column) + " row = " + str(recent_row))
         print_board()
         put_board_card(recycle_card_id, row1, column1, row2, column2)
         print_board_card()
