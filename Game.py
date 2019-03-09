@@ -383,6 +383,17 @@ def recycle_card(row_num, column_num, row_num2, column_num2):
     board_card[12 - row_num2][column_num2] = '  '
 
 
+def place_temp_half(type_str, row_num, column_num):
+    global board_visual
+    board_visual[12 - row_num][column_num] = type_str
+
+
+def remove_temp_card(row_num1, column_num1, row_num2, column_num2):
+    global board_visual
+    board_visual[12 - row_num1][column_num1] = '  '  # set the recycled card coordinate empty
+    board_visual[12 - row_num2][column_num2] = '  '
+
+
 def get_type(half_type, row1, column1, row2,
              column2):  # get the type according to the relative position of the other half
     if row1 == row2 and half_type == "RX":
@@ -644,17 +655,17 @@ def check_in_direction_with_distance(direction, role_token, coordinate, distance
     return num_in_line
 
 
-def card_type_coordinates_association_map():
+def card_type_coordinates_association_dict():
     result = {}
     row1, column1 = 1, 1
     while column1 < 9:
         row1 = 1
         while row1 < 12:
-            if board_card[12-row1][column1] == '  ':
+            if board_visual[12 - row1][column1] == '  ':
                 card_type = 1
                 row2 = second_half_row(card_type, row1)
                 column2 = second_half_column(card_type, column1)
-                if board_card[12-row2][column2] == '  ':
+                if board_card[12 - row2][column2] == '  ':
                     if is_state_valid(row1, column1, row2, column2):
                         while card_type < 9:
                             cmd = str(card_type) + " " + str(column1) + " " + str(row1)
@@ -666,7 +677,7 @@ def card_type_coordinates_association_map():
                 card_type = 2
                 row2 = second_half_row(card_type, row1)
                 column2 = second_half_column(card_type, column1)
-                if board_card[12 - row2][column2] == '  ':
+                if board_visual[12 - row2][column2] == '  ':
                     if is_state_valid(row1, column1, row2, column2):
                         while card_type < 9:
                             cmd = str(card_type) + " " + str(column1) + " " + str(row1)
@@ -683,7 +694,7 @@ def card_type_coordinates_association_map():
 
 
 def generate_tracking_file(map):
-    with open('tracemm.txt', 'r+') as f:
+    with open('tracemm.txt', 'a') as f:
         f.writelines(len(map.get('level3')))
         f.writelines(map.get('level1')[0])
         f.writelines('\n')
@@ -694,10 +705,61 @@ def generate_tracking_file(map):
 
 
 def run_min_max():
-    return 'cmd'
+    global board_visual
+    e_counter = 0
+    minmax_trace = {'level1': [], 'level2': [], 'level3': [], "e_counter": e_counter}
+    dict_level_1 = card_type_coordinates_association_dict()
+    final_max_value = float(-10000000.0)
+    final_cmd = ''
+    for card_type_1, cmds_1 in dict_level_1:
+        for cmd_1 in cmds_1:
+            inputList_1 = command_line_parser(cmd_1)
+            row1_1 = inputList_1[2]
+            row2_1 = second_half_row(card_type_1, row1_1)
+            column1_1 = inputList_1[1]
+            column2_1 = second_half_column(card_type_1, column1_1)
+            half_name1_1 = first_half_name(card_type_1)
+            half_name2_1 = second_half_name(card_type_1)
+            place_temp_half(half_name1_1, row1_1, column1_1)
+            place_temp_half(half_name2_1, row2_1, column2_1)
+
+            dict_level_2 = card_type_coordinates_association_dict()
+            min_value = float(1000000000000.0)
+            for card_type_2, cmds_2 in dict_level_2:
+                for cmd_2 in cmds_2:
+                    inputList_2 = command_line_parser(cmd_2)
+                    row1_2 = inputList_2[2]
+                    row2_2 = second_half_row(card_type_2, row1_2)
+                    column1_2 = inputList_2[1]
+                    column2_2 = second_half_column(card_type_2, column1_2)
+                    half_name1_2 = first_half_name(card_type_2)
+                    half_name2_2 = second_half_name(card_type_2)
+                    place_temp_half(half_name1_2, row1_2, column1_2)
+                    place_temp_half(half_name2_2, row2_2, column2_2)
+
+                    dict_level_3 = card_type_coordinates_association_dict()
+                    max_value = float(-10000000000.0)
+                    for card_type_3, cmds_3 in dict_level_3:
+                        for cmd_3 in cmds_3:
+                            e = float("{:.1f}".format(evaluate(board_visual, cmd_3)))
+                            e_counter += 1
+                            if e > max_value:
+                                max_value = e
+                    minmax_trace.get('level3').append(max_value)
+                    remove_temp_card(row1_2, column1_2, row2_2, column2_2)
+                    if max_value < min_value:
+                        min_value = max_value
+            minmax_trace.get('level2').append(min_value)
+            remove_temp_card(row1_1, column1_1, row2_1, column2_1)
+            if final_max_value < min_value:
+                final_max_value = min_value
+                final_cmd = cmd_1
+    minmax_trace.get('level1').append(final_max_value)
+    minmax_trace.get('e_counter').append(e_counter)
+    return final_cmd
 
 
-def evaluate(board, cmd): #board has two additional card, try to place the third card with cmd
+def evaluate(board, cmd):  # board has two additional card, try to place the third card with cmd
     return 0
 
 
