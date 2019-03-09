@@ -697,8 +697,246 @@ def run_min_max():
     return 'cmd'
 
 
-def evaluate(board, cmd): #board has two additional card, try to place the third card with cmd
-    return 0
+def evaluate(role_select, cmd): #board has two additional card, try to place the third card with cmd
+    global board_visual
+    inputList = command_line_parser(cmd)
+    card_type = int(inputList[0])
+    row1 = inputList[2]
+    row2 = second_half_row(card_type, row1)
+    column1 = inputList[1]
+    column2 = second_half_column(card_type, column1)
+
+    factor_one = 1
+    factor_two = 5
+    factor_three = 20
+    factor_four = 1000
+    factor_half1 = 10
+    factor_half2 = 2
+    factor_empty_cell = 2
+
+    en_r = 0
+    en_x = 0
+    en_w = 0
+    en_o = 0
+    en_color = 0
+    en_dot = 0
+
+    if card_type == 1 or card_type == 4:
+        depth_arr_r = depth('R', row1, column1)
+        empty_r = empty_cell('R', row1, column1, depth_arr_r) * factor_empty_cell
+        depth_arr_d = depth('X', row1, column1)
+        empty_d = empty_cell('X', row1, column1, depth_arr_d) * factor_empty_cell
+        depth_arr_w = depth('W', row2, column2)
+        empty_w = empty_cell('W', row2, column2, depth_arr_w) * factor_empty_cell
+        depth_arr_o = depth('O', row2, column2)
+        empty_o = empty_cell('O', row2, column2, depth_arr_o) * factor_empty_cell
+    if card_type == 2 or card_type == 3:
+        depth_arr_r = depth('R', row2, column2)
+        empty_r = empty_cell('R', row2, column2, depth_arr_r) * factor_empty_cell
+        depth_arr_d = depth('X', row2, column2)
+        empty_d = empty_cell('X', row2, column2, depth_arr_d) * factor_empty_cell
+        depth_arr_w = depth('W', row1, column1)
+        empty_w = empty_cell('W', row1, column1, depth_arr_w) * factor_empty_cell
+        depth_arr_o = depth('O', row1, column1)
+        empty_o = empty_cell('O', row1, column1, depth_arr_o) * factor_empty_cell
+    if card_type == 5 or card_type == 8:
+        depth_arr_r = depth('R', row1, column1)
+        empty_r = empty_cell('R', row1, column1, depth_arr_r) * factor_empty_cell
+        depth_arr_d = depth('X', row2, column2)
+        empty_d = empty_cell('X', row2, column2, depth_arr_d) * factor_empty_cell
+        depth_arr_w = depth('W', row2, column2)
+        empty_w = empty_cell('W', row2, column2, depth_arr_w) * factor_empty_cell
+        depth_arr_o = depth('O', row1, column1)
+        empty_o = empty_cell('O', row1, column1, depth_arr_o) * factor_empty_cell
+    if card_type == 6 or card_type == 7:
+        depth_arr_r = depth('R', row2, column2)
+        empty_r = empty_cell('R', row2, column2, depth_arr_r) * factor_empty_cell
+        depth_arr_d = depth('X', row1, column1)
+        empty_d = empty_cell('X', row1, column1, depth_arr_d) * factor_empty_cell
+        depth_arr_w = depth('W', row1, column1)
+        empty_w = empty_cell('W', row1, column1, depth_arr_w) * factor_empty_cell
+        depth_arr_o = depth('O', row2, column2)
+        empty_o = empty_cell('O', row2, column2, depth_arr_o) * factor_empty_cell
+
+    score_r = [depth_arr_r[0] + depth_arr_r[1], depth_arr_r[2] + depth_arr_r[3], depth_arr_r[4] + depth_arr_r[5],
+               depth_arr_r[6] + depth_arr_r[7]]
+    score_d = [depth_arr_d[0] + depth_arr_d[1], depth_arr_d[2] + depth_arr_d[3], depth_arr_d[4] + depth_arr_d[5],
+               depth_arr_d[6] + depth_arr_d[7]]
+    score_w = [depth_arr_w[0] + depth_arr_w[1], depth_arr_w[2] + depth_arr_w[3], depth_arr_w[4] + depth_arr_w[5],
+               depth_arr_w[6] + depth_arr_w[7]]
+    score_o = [depth_arr_o[0] + depth_arr_o[1], depth_arr_o[2] + depth_arr_o[3], depth_arr_o[4] + depth_arr_o[5],
+               depth_arr_o[6] + depth_arr_o[7]]
+
+    for score in score_r:
+        if score == 1:
+            en_r += factor_one
+        if score == 2:
+            en_r += factor_two
+        if score == 3:
+            en_r += factor_three
+        if score == 4:
+            en_r += factor_four * factor_four
+            break
+
+    for score in score_d:
+        if score == 1:
+            en_x += factor_one
+        if score == 2:
+            en_x += factor_two
+        if score == 3:
+            en_x += factor_three
+        if score == 4:
+            en_x += factor_four * factor_four
+            break
+
+    for score in score_w:
+        if score == 1:
+            en_w += factor_one
+        if score == 2:
+            en_w += factor_two
+        if score == 3:
+            en_w += factor_three
+        if score == 4:
+            en_w += factor_four * factor_four
+            break
+
+    for score in score_o:
+        if score == 1:
+            en_o += factor_one
+        if score == 2:
+            en_o += factor_two
+        if score == 3:
+            en_o += factor_three
+        if score == 4:
+            en_o += factor_four * factor_four
+            break
+
+    if card_type == 1 or card_type == 4:
+        en_color = (en_r + empty_r) * factor_half1 + (en_w + empty_w) * factor_half2
+        en_dot = (en_x + empty_d) * factor_half1 + (en_o + empty_o) * factor_half2
+
+    if card_type == 2 or card_type == 3:
+        en_color = (en_w + empty_w) * factor_half1 + (en_r + empty_r) * factor_half2
+        en_dot = (en_o + empty_o) * factor_half1 + (en_x + empty_d) * factor_half2
+
+    if card_type == 5 or card_type == 8:
+        en_color = (en_r + empty_r) * factor_half1 + (en_w + empty_w) * factor_half2
+        en_dot = (en_o + empty_o) * factor_half1 + (en_x + empty_d) * factor_half2
+
+    if card_type == 6 or card_type == 7:
+        en_color = (en_w + empty_w) * factor_half1 + (en_o + empty_o) * factor_half2
+        en_dot = (en_x + empty_d) * factor_half1 + (en_r + empty_r) * factor_half2
+
+    if role_select == "color":
+        return en_color - en_dot
+    else:
+        return en_dot - en_color
+
+
+def depth(role_token, row, column):
+    global board_visual
+    coordinate = [row, column]
+    t = check_in_direction_in_virtual_board("t", role_token, coordinate)
+    b = check_in_direction_in_virtual_board("b", role_token, coordinate)
+    tr = check_in_direction_in_virtual_board("tr", role_token, coordinate)
+    bl = check_in_direction_in_virtual_board("bl", role_token, coordinate)
+    r = check_in_direction_in_virtual_board("r", role_token, coordinate)
+    l = check_in_direction_in_virtual_board("l", role_token, coordinate)
+    rb = check_in_direction_in_virtual_board("rb", role_token, coordinate)
+    lt = check_in_direction_in_virtual_board("lt", role_token, coordinate)
+    return [t,  b, tr,  bl, r,  l, rb,  lt]
+
+
+def empty_cell(role_token, row, column, depth_num):
+    global board_visual
+    coordinate = [row, column]
+    number = 0;
+    try:
+        if board_visual[12 - coordinate[0] - depth_num[0]][coordinate[1]] == ' ':
+            ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0] - depth_num[2]][coordinate[1] + depth_num[2]] == ' ':
+            ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0]][coordinate[1] + - depth_num[4]] == ' ':
+            ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0] + depth_num[6]][coordinate[1] + depth_num[6]] == ' ':
+            ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0] + depth_num[1]][coordinate[1]] == ' ':
+        ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0] + depth_num[3]][coordinate[1] - depth_num[3]] == ' ':
+        ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0]][coordinate[1] - depth_num[5]] == ' ':
+        ++number
+    except IndexError:
+    try:
+        if board_visual[12 - coordinate[0] - depth_num[7]][coordinate[1] - depth_num[7]] == ' ':
+            ++number
+    except IndexError:
+    return number
+
+
+def check_in_direction_in_virtual_board(direction, role_token, coordinate):
+    global board_visual
+    num_in_line = 0
+    distance = 1
+    while distance <= 4:
+        try:
+            if direction == "t":
+                if role_token in board_visual[12 - coordinate[0] - distance][coordinate[1]]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "tr":
+                if role_token in board_visual[12 - coordinate[0] - distance][coordinate[1] + distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "r":
+                if role_token in board_visual[12 - coordinate[0]][coordinate[1] + distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "rb":
+                if role_token in board_visual[12 - coordinate[0] + distance][coordinate[1] + distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "b":
+                if role_token in board_visual[12 - coordinate[0] + distance][coordinate[1]]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "bl":
+                if role_token in board_visual[12 - coordinate[0] + distance][coordinate[1] - distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "l":
+                if role_token in board_visual[12 - coordinate[0]][coordinate[1] - distance]:
+                    num_in_line += 1
+                else:
+                    break
+            if direction == "lt":
+                if role_token in board_visual[12 - coordinate[0] - distance][coordinate[1] - distance]:
+                    num_in_line += 1
+                else:
+                    break
+            distance += 1
+        except IndexError:  # means this card is at very bottom
+            # num_in_line += 0
+            break
+    return num_in_line
 
 
 step_counter = 0
