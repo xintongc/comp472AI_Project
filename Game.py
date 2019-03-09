@@ -843,12 +843,13 @@ else:
         human_player_role = 'dot'
         print('Player1 plays ' + human_player_role + " Player2 plays " + ai_player_role)
 
+print_board()
+
 while step_counter <= 60:
     while card_id <= recycle_step:
         playerId = toggle_player(playerId)
 
         print_card_type()
-        print_board()
 
         if playerId == human_player_num:
             role = human_player_role
@@ -959,7 +960,7 @@ while step_counter <= 60:
         if playerId == ai_player_num:
             role = ai_player_role
             recyclable_cards = find_recyclable_card_nums()
-            min_en = float(1000000000.0)
+            min_en = float(100000000000.0)
             selected_card =''
             for card in recyclable_cards:
                 card_type = card[0]
@@ -977,7 +978,7 @@ while step_counter <= 60:
             column2 = selected_card[4]
             recycle_card(row1, column1, row2, column2)
 
-            cmd = run_min_max(role)
+            cmd = run_min_max_recycle(role, selected_card)
 
             inputList = command_line_parser(cmd)
             card_type = int(inputList[0])
