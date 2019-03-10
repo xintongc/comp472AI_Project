@@ -507,6 +507,22 @@ def run_min_max(role):
     final_cmd = ''
     for card_type_1, cmds_1 in dict_level_1.items():
         for cmd_1 in cmds_1:
+            e_value = evaluate(role, cmd_1)
+            if e_value > 10000:
+                return cmd_1
+            if e_value < -10000:
+                inputList = command_line_parser(cmd_1)
+                card_type = int(inputList[0])
+                if card_type <= 4:
+                    card_type = str(card_type + 4)
+                else:
+                    card_type = str(card_type - 4)
+                row1 = inputList[2]
+                column1 = inputList[1]
+                return card_type + ' ' + str(column1) + ' ' + str(row1)
+
+    for card_type_1, cmds_1 in dict_level_1.items():
+        for cmd_1 in cmds_1:
             inputList_1 = command_line_parser(cmd_1)
             row1_1 = inputList_1[2]
             row2_1 = second_half_row(card_type_1, row1_1)
@@ -536,22 +552,19 @@ def run_min_max(role):
                     for card_type_3, cmds_3 in dict_level_3.items():
                         for cmd_3 in cmds_3:
                             e = float("{:.1f}".format(evaluate(role, cmd_3)))
+                            # print("Level3--MAX------------------@" + str(e) + " "+ cmd_3)
                             e_counter += 1
                             if e > max_value:
                                 max_value = e
-                                # print("Level3--MAX------------------" + str(max_value) + cmd_3)
                     minmax_trace.get('level3').append(max_value)
                     remove_temp_card(row1_2, column1_2, row2_2, column2_2)
                     if max_value < min_value:
                         min_value = max_value
-                        # print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
             minmax_trace.get('level2').append(min_value)
             remove_temp_card(row1_1, column1_1, row2_1, column2_1)
             if final_max_value < min_value:
                 final_max_value = min_value
                 final_cmd = cmd_1
-                print("--------Level1------Selecting Level 1 MAX--------------" + str(
-                    final_max_value) + " " + cmd_1)
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.setdefault("e_counter", e_counter)
 
@@ -680,10 +693,10 @@ def evaluate(role_select, cmd):  # board has two additional card, try to place t
 
     factor_one = 1
     factor_two = 5
-    factor_three = 20
-    factor_four = 1000
+    factor_three = 80
+    factor_four = 100
     factor_half1 = 10
-    factor_half2 = 2
+    factor_half2 = 1
     factor_empty_cell = 2
 
     en_r = 0
@@ -800,9 +813,15 @@ def evaluate(role_select, cmd):  # board has two additional card, try to place t
         en_dot = (en_x + empty_d) * factor_half1 + (en_r + empty_r) * factor_half2
 
     if role_select == "color":
-        return en_color - en_dot
+        if en_dot >= 800:
+            return -20000
+        else:
+            return en_color - en_dot
     else:
-        return en_dot - en_color
+        if en_color >= 800:
+            return -20000
+        else:
+            return en_dot - en_color
 
 
 def depth(role_token, row, column):
@@ -933,7 +952,7 @@ recent_column = 100
 toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
-recycle_step = 3
+recycle_step = 10
 isFileGenEnabled = False
 file_name = 'minmaxtrace1.txt'
 
