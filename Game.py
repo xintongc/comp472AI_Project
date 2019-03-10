@@ -504,14 +504,16 @@ def run_min_max(role):
             if e_value > 10000:
                 return cmd_1
             if e_value < -10000:
-                inputList_1 = command_line_parser(cmd_1)
+                inputList = command_line_parser(cmd_1)
                 card_type = int(inputList[0])
+                if card_type <= 4:
+                    card_type = str(card_type + 4)
+                else:
+                    card_type = str(card_type - 4)
                 row1 = inputList[2]
                 column1 = inputList[1]
-                if card_type <= 4:
-                    return str(card_type + 4) + column1 + row1
-                else:
-                    return str(card_type - 4) + column1 + row1
+                return card_type + ' ' + str(column1) + ' ' + str(row1)
+
     for card_type_1, cmds_1 in dict_level_1.items():
         for cmd_1 in cmds_1:
             inputList_1 = command_line_parser(cmd_1)
@@ -639,7 +641,7 @@ def run_min_max_recycle():
                             remove_temp_card(row1_2, column1_2, row2_2, column2_2)
                             if max_value < min_value:
                                 min_value = max_value
-                                print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
+                                # print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
 
                     place_temp_half(first_half_name_recycle_2, card_2[1], card_2[2])
                     place_temp_half(second_half_name_recycle_2, card_2[3], card_2[4])
@@ -652,8 +654,7 @@ def run_min_max_recycle():
                         final_max_value = min_value
                         final_cmd = cmd_1
                         selected_card = card_1
-                        print(
-                            "--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
+                        # print("--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
         place_temp_half(first_half_name_recycle_1, card_1[1], card_1[2])
         place_temp_half(second_half_name_recycle_1, card_1[3], card_1[4])
         place_temp_card_to_board_card(recycle_card_type_1, card_1[1], card_1[2], card_1[3], card_1[4])
@@ -677,8 +678,8 @@ def evaluate(role_select, cmd): #board has two additional card, try to place the
 
     factor_one = 1
     factor_two = 5
-    factor_three = 20
-    factor_four = 1000
+    factor_three = 80
+    factor_four = 100
     factor_half1 = 10
     factor_half2 = 1
     factor_empty_cell = 2
@@ -797,9 +798,15 @@ def evaluate(role_select, cmd): #board has two additional card, try to place the
         en_dot = (en_x + empty_d) * factor_half1 + (en_r + empty_r) * factor_half2
 
     if role_select == "color":
-        return en_color - en_dot
+        if en_dot >= 800:
+            return -20000
+        else:
+            return en_color - en_dot
     else:
-        return en_dot - en_color
+        if en_color >= 800:
+            return -20000
+        else:
+            return en_dot - en_color
 
 
 def depth(role_token, row, column):
@@ -930,7 +937,7 @@ recent_column = 100
 toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
-recycle_step = 3
+recycle_step = 10
 isFileGenEnabled = False
 
 
