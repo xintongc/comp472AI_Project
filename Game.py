@@ -284,21 +284,21 @@ def print_card_type():
 
 
 def parse_colunm(card_column):
-    if card_column == "A":
+    if card_column == "A" or card_column == "1":
         return 1
-    elif card_column == "B":
+    elif card_column == "B" or card_column == "2":
         return 2
-    elif card_column == "C":
+    elif card_column == "C" or card_column == "3":
         return 3
-    elif card_column == "D":
+    elif card_column == "D" or card_column == "4":
         return 4
-    elif card_column == "E":
+    elif card_column == "E" or card_column == "5":
         return 5
-    elif card_column == "F":
+    elif card_column == "F" or card_column == "6":
         return 6
-    elif card_column == "G":
+    elif card_column == "G" or card_column == "7":
         return 7
-    elif card_column == "H":
+    elif card_column == "H" or card_column == "":
         return 8
     else:
         return 0
@@ -467,23 +467,26 @@ def find_recyclable_card_nums():
 
 def generate_tracking_file(dict):
     with open('tracemm.txt', 'a') as f:
-        f.writelines(dict.get('e_counter'))
-        f.writelines(dict.get('level1')[0])
-        f.writelines('\n')
+        f.write(str(dict.get('e_counter')))
+        f.write('\n')
+        f.write(str(dict.get('level1')[0]))
+        f.write('\n')
+        f.write('\n')
         for num in dict.get('level2'):
-            f.writelines(num)
-        f.writelines('\n')
+            f.write(str(num))
+            f.write('\n')
+        f.write('\n')
         f.close()
 
 
 def run_min_max(role):
-    global board_visual, isFileGenEnabled
+    global isFileGenEnabled
     e_counter = 0
-    minmax_trace = {'level1': [], 'level2': [], 'level3': [], "e_counter": e_counter}
+    minmax_trace = {'level1': [], 'level2': [], 'level3': []}
     dict_level_1 = card_type_coordinates_association_dict()
     final_max_value = float(-10000000.0)
     final_cmd = ''
-    for card_type_1, cmds_1 in dict_level_1:
+    for card_type_1, cmds_1 in dict_level_1.items():
         for cmd_1 in cmds_1:
             inputList_1 = command_line_parser(cmd_1)
             row1_1 = inputList_1[2]
@@ -497,7 +500,7 @@ def run_min_max(role):
 
             dict_level_2 = card_type_coordinates_association_dict()
             min_value = float(10000000.0)
-            for card_type_2, cmds_2 in dict_level_2:
+            for card_type_2, cmds_2 in dict_level_2.items():
                 for cmd_2 in cmds_2:
                     inputList_2 = command_line_parser(cmd_2)
                     row1_2 = inputList_2[2]
@@ -511,28 +514,55 @@ def run_min_max(role):
 
                     dict_level_3 = card_type_coordinates_association_dict()
                     max_value = float(-10000000.0)
-                    for card_type_3, cmds_3 in dict_level_3:
+                    for card_type_3, cmds_3 in dict_level_3.items():
                         for cmd_3 in cmds_3:
                             e = float("{:.1f}".format(evaluate(role, cmd_3)))
                             e_counter += 1
                             if e > max_value:
                                 max_value = e
+                                print("Level3--MAX------------------" + str(max_value) + cmd_3)
                     minmax_trace.get('level3').append(max_value)
                     remove_temp_card(row1_2, column1_2, row2_2, column2_2)
                     if max_value < min_value:
                         min_value = max_value
+                        print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
             minmax_trace.get('level2').append(min_value)
             remove_temp_card(row1_1, column1_1, row2_1, column2_1)
             if final_max_value < min_value:
                 final_max_value = min_value
                 final_cmd = cmd_1
+                print("--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
     minmax_trace.get('level1').append(final_max_value)
-    minmax_trace.get('e_counter').append(e_counter)
+    minmax_trace.setdefault("e_counter", e_counter)
 
     if isFileGenEnabled:
         generate_tracking_file(minmax_trace)
 
     return final_cmd
+
+
+def run_min_max_recycle():
+    cards_remove_level_1 = find_recyclable_card_nums()
+    for card_1 in cards_remove_level_1:
+        card_type_1 = card_1[0]
+        remove_temp_card(card_1[1], card_1[2], card_1[3], card_1[4])
+        dict_level_1 = card_type_coordinates_association_dict()
+        for card_type_1, cmds_1 in dict_level_1.items():
+            for cmd_1 in cmds_1:
+                inputList_1 = command_line_parser(cmd_1)
+                inputList_1 = command_line_parser(cmd_1)
+                row1_1 = inputList_1[2]
+                row2_1 = second_half_row(card_type_1, row1_1)
+                column1_1 = inputList_1[1]
+                column2_1 = second_half_column(card_type_1, column1_1)
+                half_name1_1 = first_half_name(card_type_1)
+                half_name2_1 = second_half_name(card_type_1)
+                place_temp_half(half_name1_1, row1_1, column1_1)
+                place_temp_half(half_name2_1, row2_1, column2_1)
+
+                cards_remove_level_2 = find_recyclable_card_nums()
+                for card in cards_remove_level_2:
+                    card_type_2 = card_type_coordinates_association_dict()
 
 
 def evaluate(role_select, cmd): #board has two additional card, try to place the third card with cmd
@@ -800,13 +830,13 @@ toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
 recycle_step = 24
-isFileGenEnabled = False
+isFileGenEnabled = True
 
 
 
 
 print("AI is deciding it plays the as 1st Player or 2nd Player:....")
-ai_player_num = random.randint(1, 3)
+ai_player_num = random.randint(1, 2)
 human_player_num = 0
 if ai_player_num == 1:
     human_player_num = 2
@@ -821,9 +851,9 @@ print('Human is Player ' + human_player_num)
 
 ai_player_role = ''
 human_player_role = ''
-if ai_player_num == 1:
+if ai_player_num == "1":
     print("AI is deciding which role to play (color or dot):......")
-    i = random.randint(1, 3)
+    i = random.randint(1, 2)
     if i == 1:
         ai_player_role = 'color'
         human_player_role = 'dot'
@@ -897,8 +927,8 @@ while step_counter <= 60:
         print("Last Card placed on col = " + str(recent_column) + " row = " + str(recent_row))
 
         put_board_card(card_num, row1, column1, row2, column2)
-        print_board()
         print_board_card()
+        print_board()
         step_counter = step_counter + 1
     while card_id > recycle_step:
         playerId = toggle_player(playerId)
@@ -1001,6 +1031,6 @@ while step_counter <= 60:
 
         recent_row = row1
         recent_column = column1
-        print_board()
         put_board_card(recycle_card_id, row1, column1, row2, column2)
         print_board_card()
+        print_board()
