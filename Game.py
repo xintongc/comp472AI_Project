@@ -31,11 +31,14 @@ board_card = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
 
 
 def command_line_parser(cmd):
-    inputs = str(cmd).split(' ')
-    card_type = inputs[0]
-    card_column = parse_colunm(inputs[1])
-    card_row = parse_row(inputs[2])
-    return [card_type, card_column, card_row]
+    try:
+        inputs = str(cmd).split(' ')
+        card_type = inputs[0]
+        card_column = parse_colunm(inputs[1])
+        card_row = parse_row(inputs[2])
+        return [card_type, card_column, card_row]
+    except IndexError:  # means this card is at very bottom
+        command_line_parser('1 0 0')
 
 
 def print_board():
@@ -117,6 +120,11 @@ def put_board_card(card_num, row_num1, column_num1, row_num2, column_num2):
     dict_row[
         card_num] = row_num2  # create 2 dictionary, we can find the other halfs position according to card_id, used for recycle
     dict_column[card_num] = column2
+
+
+def temp_put_board_card(card_num, row_num1, column_num1, row_num2, column_num2):
+    board_card[12 - row_num1][column_num1] = card_num
+    board_card[12 - row_num2][column_num2] = card_num
 
 
 def print_board_card():
@@ -236,7 +244,7 @@ def is_recycle_state_valid(rotated, row1, column1, row2, column2):
 
 def is_recycle_valid(recycle_card_id, row1, column1):
     if row1 == recent_row and column1 == recent_column:
-        print("This card just been moved/placed")
+        #print("This card just been moved/placed")
         return False
 
     if board_visual[12 - row1][column1] == '  ':
@@ -260,7 +268,6 @@ def is_recycle_valid(recycle_card_id, row1, column1):
                 return True
     except IndexError:  # means this card is at very bottom
         return True
-        return False
 
 
 def is_int(n):
@@ -305,7 +312,7 @@ def parse_colunm(card_column):
         return 6
     elif card_column == "G" or card_column == "7":
         return 7
-    elif card_column == "H" or card_column == "":
+    elif card_column == "H" or card_column == "8":
         return 8
     else:
         return 0
@@ -417,11 +424,11 @@ def card_type_coordinates_association_dict():
     while column1 < 9:
         row1 = 1
         while row1 < 12:
-            if board_card[12-row1][column1] == '  ':
+            if board_card[12 - row1][column1] == '  ':
                 card_type = 1
                 row2 = second_half_row(card_type, row1)
                 column2 = second_half_column(card_type, column1)
-                if board_card[12-row2][column2] == '  ':
+                if board_card[12 - row2][column2] == '  ':
                     if is_state_valid(row1, column1, row2, column2):
                         while card_type < 9:
                             cmd = str(card_type) + " " + str(column1) + " " + str(row1)
@@ -478,7 +485,7 @@ def find_recyclable_card_nums():
 
 
 def generate_tracking_file(dict):
-    with open('tracemm.txt', 'a') as f:
+    with open(file_name, 'a') as f:
         f.write(str(dict.get('e_counter')))
         f.write('\n')
         f.write(str(dict.get('level1')[0]))
@@ -532,18 +539,19 @@ def run_min_max(role):
                             e_counter += 1
                             if e > max_value:
                                 max_value = e
-                                print("Level3--MAX------------------" + str(max_value) + cmd_3)
+                                # print("Level3--MAX------------------" + str(max_value) + cmd_3)
                     minmax_trace.get('level3').append(max_value)
                     remove_temp_card(row1_2, column1_2, row2_2, column2_2)
                     if max_value < min_value:
                         min_value = max_value
-                        print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
+                        # print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
             minmax_trace.get('level2').append(min_value)
             remove_temp_card(row1_1, column1_1, row2_1, column2_1)
             if final_max_value < min_value:
                 final_max_value = min_value
                 final_cmd = cmd_1
-                print("--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
+                print("--------Level1------Selecting Level 1 MAX--------------" + str(
+                    final_max_value) + " " + cmd_1)
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.setdefault("e_counter", e_counter)
 
@@ -553,7 +561,7 @@ def run_min_max(role):
     return final_cmd
 
 
-def run_min_max_recycle():
+def run_min_max_recycle(role):
     global isFileGenEnabled
     e_counter = 0
     minmax_trace = {'level1': [], 'level2': [], 'level3': []}
@@ -563,8 +571,8 @@ def run_min_max_recycle():
     cards_remove_level_1 = find_recyclable_card_nums()
     for card_1 in cards_remove_level_1:
         recycle_card_num_1 = card_1[0]
-        first_half_name_recycle_1 = board_visual[12-card_1[1]][card_1[2]]
-        second_half_name_recycle_1 = board_visual[12-card_1[3]][card_1[4]]
+        first_half_name_recycle_1 = board_visual[12 - card_1[1]][card_1[2]]
+        second_half_name_recycle_1 = board_visual[12 - card_1[3]][card_1[4]]
         recycle_card(card_1[1], card_1[2], card_1[3], card_1[4])
         dict_level_1 = card_type_coordinates_association_dict()
         for card_type_1, cmds_1 in dict_level_1.items():
@@ -579,14 +587,14 @@ def run_min_max_recycle():
 
                 place_temp_half(half_name1_1, row1_1, column1_1)
                 place_temp_half(half_name2_1, row2_1, column2_1)
-                put_board_card(recycle_card_num_1, row1_1, column1_1, row2_1, column2_1)
+                temp_put_board_card(recycle_card_num_1, row1_1, column1_1, row2_1, column2_1)
 
                 min_value = float(10000000.0)
                 cards_remove_level_2 = find_recyclable_card_nums()
                 for card_2 in cards_remove_level_2:
                     recycle_card_num_2 = card_2[0]
-                    first_half_name_recycle_2 = board_visual[12-card_2[1]][card_2[2]]
-                    second_half_name_recycle_2 = board_visual[12-card_2[3]][card_2[4]]
+                    first_half_name_recycle_2 = board_visual[12 - card_2[1]][card_2[2]]
+                    second_half_name_recycle_2 = board_visual[12 - card_2[3]][card_2[4]]
                     recycle_card(card_2[1], card_2[2], card_2[3], card_2[4])
                     dict_level_2 = card_type_coordinates_association_dict()
                     for card_type_2, cmds_2 in dict_level_2.items():
@@ -600,14 +608,14 @@ def run_min_max_recycle():
                             half_name2_2 = second_half_name(card_type_2)
                             place_temp_half(half_name1_2, row1_2, column1_2)
                             place_temp_half(half_name2_2, row2_2, column2_2)
-                            put_board_card(recycle_card_num_2, row1_2, column1_2, row2_2, column2_2)
+                            temp_put_board_card(recycle_card_num_2, row1_2, column1_2, row2_2, column2_2)
 
                             max_value = float(-10000000.0)
                             cards_remove_level_3 = find_recyclable_card_nums()
                             for card_3 in cards_remove_level_3:
                                 recycle_card_num_3 = card_3[0]
-                                first_half_name_recycle_3 = board_visual[12-card_3[1]][card_3[2]]
-                                second_half_name_recycle_3 = board_visual[12-card_3[3]][card_3[4]]
+                                first_half_name_recycle_3 = board_visual[12 - card_3[1]][card_3[2]]
+                                second_half_name_recycle_3 = board_visual[12 - card_3[3]][card_3[4]]
                                 recycle_card(card_3[1], card_3[2], card_3[3], card_3[4])
                                 dict_level_3 = card_type_coordinates_association_dict()
                                 for card_type_3, cmds_3 in dict_level_3.items():
@@ -616,35 +624,42 @@ def run_min_max_recycle():
                                         e_counter += 1
                                         if e > max_value:
                                             max_value = e
-                                            print("Level3--MAX------------------" + str(max_value) + cmd_3)
+                                            # print("Level3--MAX------------------" + str(max_value) + cmd_3)
                                 place_temp_half(first_half_name_recycle_3, card_3[1], card_3[2])
                                 place_temp_half(second_half_name_recycle_3, card_3[3], card_3[4])
-                                put_board_card(recycle_card_num_3, card_3[1], card_3[2], card_3[3], card_3[4])
+                                temp_put_board_card(recycle_card_num_3, card_3[1], card_3[2], card_3[3], card_3[4])
 
-                            #minmax_trace.get('level3').append(max_value)
-                            remove_temp_card(row1_2, column1_2, row2_2, column2_2)
+                            # minmax_trace.get('level3').append(max_value)
+                            recycle_card(row1_2, column1_2, row2_2, column2_2)
+
                             if max_value < min_value:
                                 min_value = max_value
-                                print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
+                                # print("-----Level2---MIN-----------------" + str(min_value) + cmd_2)
 
                     place_temp_half(first_half_name_recycle_2, card_2[1], card_2[2])
                     place_temp_half(second_half_name_recycle_2, card_2[3], card_2[4])
-                    put_board_card(recycle_card_num_2, card_2[1], card_2[2], card_2[3], card_2[4])
+                    temp_put_board_card(recycle_card_num_2, card_2[1], card_2[2], card_2[3], card_2[4])
 
                 minmax_trace.get('level2').append(min_value)
                 recycle_card(row1_1, column1_1, row2_1, column2_1)
 
                 if final_max_value < min_value:
-
-                    if ((half_name1_1 != first_half_name_recycle_1 and half_name2_1 != second_half_name_recycle_1) or row1_1 != card_1[1] or column1_1 != card_1[2]) and (recent_column != card_1[2] and recent_row != card_1[1]):
+                    # if ((
+                    #             half_name1_1 != first_half_name_recycle_1 and half_name2_1 != second_half_name_recycle_1) or row1_1 !=
+                    #     card_1[1] or column1_1 != card_1[2]) and (
+                    #         recent_column != card_1[2] and recent_row != card_1[1]):
                         final_max_value = min_value
                         final_cmd = cmd_1
                         selected_card = card_1
-                        print(
-                            "--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
+                        print("--------Level1------Selecting Level 1 MAX--------------" + str(
+                            final_max_value) + " " + cmd_1)
+        if selected_card == '':
+            final_max_value = 0
+            selected_card = card_1
+            final_cmd = cmd_1
         place_temp_half(first_half_name_recycle_1, card_1[1], card_1[2])
         place_temp_half(second_half_name_recycle_1, card_1[3], card_1[4])
-        put_board_card(recycle_card_num_1, card_1[1], card_1[2], card_1[3], card_1[4])
+        temp_put_board_card(recycle_card_num_1, card_1[1], card_1[2], card_1[3], card_1[4])
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.setdefault("e_counter", e_counter)
 
@@ -654,7 +669,7 @@ def run_min_max_recycle():
     return [selected_card, final_cmd]
 
 
-def evaluate(role_select, cmd): #board has two additional card, try to place the third card with cmd
+def evaluate(role_select, cmd):  # board has two additional card, try to place the third card with cmd
     global board_visual
     inputList = command_line_parser(cmd)
     card_type = int(inputList[0])
@@ -801,7 +816,7 @@ def depth(role_token, row, column):
     l = check_in_direction_in_virtual_board("l", role_token, coordinate)
     rb = check_in_direction_in_virtual_board("rb", role_token, coordinate)
     lt = check_in_direction_in_virtual_board("lt", role_token, coordinate)
-    return [t,  b, tr,  bl, r,  l, rb,  lt]
+    return [t, b, tr, bl, r, l, rb, lt]
 
 
 def empty_cell(role_token, row, column, depth_num):
@@ -920,9 +935,14 @@ toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
 recycle_step = 3
 isFileGenEnabled = False
+file_name = 'minmaxtrace1.txt'
 
-
-
+file = input("Do you want to print trace file? (y/n)")
+try:
+    if file == 'y' or file =='n':
+        isFileGenEnabled = True
+except Exception:
+    isFileGenEnabled = False
 
 print("AI is deciding it plays the as 1st Player or 2nd Player:....")
 ai_player_num = random.randint(1, 2)
@@ -936,7 +956,6 @@ ai_player_num = str(ai_player_num)
 human_player_num = str(human_player_num)
 print("AI chooses to be Player " + ai_player_num)
 print('Human is Player ' + human_player_num)
-
 
 ai_player_role = ''
 human_player_role = ''
@@ -1001,7 +1020,6 @@ while step_counter <= 60:
             row2 = second_half_row(card_type, row1)
             column1 = inputList[1]
             column2 = second_half_column(card_type, column1)
-
 
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
@@ -1082,8 +1100,9 @@ while step_counter <= 60:
         if playerId == ai_player_num:
             role = ai_player_role
 
-            recycle_and_cmd = run_min_max_recycle()
+            recycle_and_cmd = run_min_max_recycle(role)
             card_to_recycle = recycle_and_cmd[0]
+            recycle_card_id = card_to_recycle[0]
 
             recycle_card(card_to_recycle[1], card_to_recycle[2], card_to_recycle[3], card_to_recycle[4])
 
@@ -1096,17 +1115,17 @@ while step_counter <= 60:
             column1 = inputList[1]
             column2 = second_half_column(card_type, column1)
 
-
-
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
+
         place_half(role, half_name1, row1, column1)
         place_half(role, half_name2, row2, column2)
+        put_board_card(recycle_card_id, row1, column1, row2, column2)
 
         dict_card_type[recycle_card_id] = card_type
 
         recent_row = row1
         recent_column = column1
-        put_board_card(recycle_card_id, row1, column1, row2, column2)
+
         print_board_card()
         print_board()
