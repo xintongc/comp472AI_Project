@@ -576,8 +576,10 @@ def run_min_max_recycle():
                 column2_1 = second_half_column(card_type_1, column1_1)
                 half_name1_1 = first_half_name(card_type_1)
                 half_name2_1 = second_half_name(card_type_1)
+
                 place_temp_half(half_name1_1, row1_1, column1_1)
                 place_temp_half(half_name2_1, row2_1, column2_1)
+                put_board_card(recycle_card_type_1, row1_1, column1_1, row2_1, column2_1)
 
                 min_value = float(10000000.0)
                 cards_remove_level_2 = find_recyclable_card_nums()
@@ -585,7 +587,7 @@ def run_min_max_recycle():
                     recycle_card_type_2 = card_2[0]
                     first_half_name_recycle_2 = first_half_name(recycle_card_type_2)
                     second_half_name_recycle_2 = second_half_name(recycle_card_type_2)
-                    remove_temp_card(card_2[1], card_2[2], card_2[3], card_2[4])
+                    recycle_card(card_2[1], card_2[2], card_2[3], card_2[4])
                     dict_level_2 = card_type_coordinates_association_dict()
                     for card_type_2, cmds_2 in dict_level_2.items():
                         for cmd_2 in cmds_2:
@@ -598,6 +600,7 @@ def run_min_max_recycle():
                             half_name2_2 = second_half_name(card_type_2)
                             place_temp_half(half_name1_2, row1_2, column1_2)
                             place_temp_half(half_name2_2, row2_2, column2_2)
+                            put_board_card(recycle_card_type_2, row1_2, column1_2, row2_2, column2_2)
 
                             max_value = float(-10000000.0)
                             cards_remove_level_3 = find_recyclable_card_nums()
@@ -605,7 +608,7 @@ def run_min_max_recycle():
                                 recycle_card_type_3 = card_3[0]
                                 first_half_name_recycle_3 = first_half_name(recycle_card_type_3)
                                 second_half_name_recycle_3 = second_half_name(recycle_card_type_3)
-                                remove_temp_card(card_3[1], card_3[2], card_3[3], card_3[4])
+                                recycle_card(card_3[1], card_3[2], card_3[3], card_3[4])
                                 dict_level_3 = card_type_coordinates_association_dict()
                                 for card_type_3, cmds_3 in dict_level_3.items():
                                     for cmd_3 in cmds_3:
@@ -616,6 +619,7 @@ def run_min_max_recycle():
                                             print("Level3--MAX------------------" + str(max_value) + cmd_3)
                                 place_temp_half(first_half_name_recycle_3, card_3[1], card_3[2])
                                 place_temp_half(second_half_name_recycle_3, card_3[3], card_3[4])
+                                put_board_card(recycle_card_type_3, card_3[1], card_3[2], card_3[3], card_3[4])
 
                             #minmax_trace.get('level3').append(max_value)
                             remove_temp_card(row1_2, column1_2, row2_2, column2_2)
@@ -625,9 +629,10 @@ def run_min_max_recycle():
 
                     place_temp_half(first_half_name_recycle_2, card_2[1], card_2[2])
                     place_temp_half(second_half_name_recycle_2, card_2[3], card_2[4])
+                    put_board_card(recycle_card_type_2, card_2[1], card_2[2], card_2[3], card_2[4])
 
                 minmax_trace.get('level2').append(min_value)
-                remove_temp_card(row1_1, column1_1, row2_1, column2_1)
+                recycle_card(row1_1, column1_1, row2_1, column2_1)
 
                 if final_max_value < min_value:
                     if (card_type_1 != recycle_card_type_1 or row1_1 != card_1[1] or column1_1 != card_1[2]) and (recent_column != card_1[2] and recent_row != card_1[1]):
@@ -638,7 +643,7 @@ def run_min_max_recycle():
                             "--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
         place_temp_half(first_half_name_recycle_1, card_1[1], card_1[2])
         place_temp_half(second_half_name_recycle_1, card_1[3], card_1[4])
-        place_temp_card_to_board_card(recycle_card_type_1, card_1[1], card_1[2], card_1[3], card_1[4])
+        put_board_card(recycle_card_type_1, card_1[1], card_1[2], card_1[3], card_1[4])
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.setdefault("e_counter", e_counter)
 
