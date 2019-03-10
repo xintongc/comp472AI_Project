@@ -799,7 +799,7 @@ recent_column = 100
 toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
-recycle_step = 2
+recycle_step = 24
 isFileGenEnabled = False
 
 
@@ -812,6 +812,9 @@ if ai_player_num == 1:
     human_player_num = 2
 else:
     human_player_num = 1
+
+ai_player_num = str(ai_player_num)
+human_player_num = str(human_player_num)
 print("AI chooses to be Player " + ai_player_num)
 print('Human is Player ' + human_player_num)
 
@@ -978,7 +981,7 @@ while step_counter <= 60:
             column2 = selected_card[4]
             recycle_card(row1, column1, row2, column2)
 
-            cmd = run_min_max_recycle(role, selected_card)
+            # cmd = run_min_max_recycle(role, selected_card)
 
             inputList = command_line_parser(cmd)
             card_type = int(inputList[0])
