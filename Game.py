@@ -513,6 +513,7 @@ def run_min_max(role):
                 else:
                     return str(card_type - 4) + column1 + row1
     for card_type_1, cmds_1 in dict_level_1.items():
+        for cmd_1 in cmds_1:
             inputList_1 = command_line_parser(cmd_1)
             row1_1 = inputList_1[2]
             row2_1 = second_half_row(card_type_1, row1_1)
