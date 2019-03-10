@@ -562,9 +562,9 @@ def run_min_max_recycle():
 
     cards_remove_level_1 = find_recyclable_card_nums()
     for card_1 in cards_remove_level_1:
-        recycle_card_type_1 = card_1[0]
-        first_half_name_recycle_1 = first_half_name(recycle_card_type_1)
-        second_half_name_recycle_1 = second_half_name(recycle_card_type_1)
+        recycle_card_num_1 = card_1[0]
+        first_half_name_recycle_1 = board_visual[12-card_1[1]][card_1[2]]
+        second_half_name_recycle_1 = board_visual[12-card_1[3]][card_1[4]]
         recycle_card(card_1[1], card_1[2], card_1[3], card_1[4])
         dict_level_1 = card_type_coordinates_association_dict()
         for card_type_1, cmds_1 in dict_level_1.items():
@@ -579,14 +579,14 @@ def run_min_max_recycle():
 
                 place_temp_half(half_name1_1, row1_1, column1_1)
                 place_temp_half(half_name2_1, row2_1, column2_1)
-                put_board_card(recycle_card_type_1, row1_1, column1_1, row2_1, column2_1)
+                put_board_card(recycle_card_num_1, row1_1, column1_1, row2_1, column2_1)
 
                 min_value = float(10000000.0)
                 cards_remove_level_2 = find_recyclable_card_nums()
                 for card_2 in cards_remove_level_2:
-                    recycle_card_type_2 = card_2[0]
-                    first_half_name_recycle_2 = first_half_name(recycle_card_type_2)
-                    second_half_name_recycle_2 = second_half_name(recycle_card_type_2)
+                    recycle_card_num_2 = card_2[0]
+                    first_half_name_recycle_2 = board_visual[12-card_2[1]][card_2[2]]
+                    second_half_name_recycle_2 = board_visual[12-card_2[3]][card_2[4]]
                     recycle_card(card_2[1], card_2[2], card_2[3], card_2[4])
                     dict_level_2 = card_type_coordinates_association_dict()
                     for card_type_2, cmds_2 in dict_level_2.items():
@@ -600,14 +600,14 @@ def run_min_max_recycle():
                             half_name2_2 = second_half_name(card_type_2)
                             place_temp_half(half_name1_2, row1_2, column1_2)
                             place_temp_half(half_name2_2, row2_2, column2_2)
-                            put_board_card(recycle_card_type_2, row1_2, column1_2, row2_2, column2_2)
+                            put_board_card(recycle_card_num_2, row1_2, column1_2, row2_2, column2_2)
 
                             max_value = float(-10000000.0)
                             cards_remove_level_3 = find_recyclable_card_nums()
                             for card_3 in cards_remove_level_3:
-                                recycle_card_type_3 = card_3[0]
-                                first_half_name_recycle_3 = first_half_name(recycle_card_type_3)
-                                second_half_name_recycle_3 = second_half_name(recycle_card_type_3)
+                                recycle_card_num_3 = card_3[0]
+                                first_half_name_recycle_3 = board_visual[12-card_3[1]][card_3[2]]
+                                second_half_name_recycle_3 = board_visual[12-card_3[3]][card_3[4]]
                                 recycle_card(card_3[1], card_3[2], card_3[3], card_3[4])
                                 dict_level_3 = card_type_coordinates_association_dict()
                                 for card_type_3, cmds_3 in dict_level_3.items():
@@ -619,7 +619,7 @@ def run_min_max_recycle():
                                             print("Level3--MAX------------------" + str(max_value) + cmd_3)
                                 place_temp_half(first_half_name_recycle_3, card_3[1], card_3[2])
                                 place_temp_half(second_half_name_recycle_3, card_3[3], card_3[4])
-                                put_board_card(recycle_card_type_3, card_3[1], card_3[2], card_3[3], card_3[4])
+                                put_board_card(recycle_card_num_3, card_3[1], card_3[2], card_3[3], card_3[4])
 
                             #minmax_trace.get('level3').append(max_value)
                             remove_temp_card(row1_2, column1_2, row2_2, column2_2)
@@ -629,13 +629,14 @@ def run_min_max_recycle():
 
                     place_temp_half(first_half_name_recycle_2, card_2[1], card_2[2])
                     place_temp_half(second_half_name_recycle_2, card_2[3], card_2[4])
-                    put_board_card(recycle_card_type_2, card_2[1], card_2[2], card_2[3], card_2[4])
+                    put_board_card(recycle_card_num_2, card_2[1], card_2[2], card_2[3], card_2[4])
 
                 minmax_trace.get('level2').append(min_value)
                 recycle_card(row1_1, column1_1, row2_1, column2_1)
 
                 if final_max_value < min_value:
-                    if (card_type_1 != recycle_card_type_1 or row1_1 != card_1[1] or column1_1 != card_1[2]) and (recent_column != card_1[2] and recent_row != card_1[1]):
+
+                    if ((half_name1_1 != first_half_name_recycle_1 and half_name2_1 != second_half_name_recycle_1) or row1_1 != card_1[1] or column1_1 != card_1[2]) and (recent_column != card_1[2] and recent_row != card_1[1]):
                         final_max_value = min_value
                         final_cmd = cmd_1
                         selected_card = card_1
@@ -643,7 +644,7 @@ def run_min_max_recycle():
                             "--------------------------------Level1------MAX--------------" + str(final_max_value) + cmd_1)
         place_temp_half(first_half_name_recycle_1, card_1[1], card_1[2])
         place_temp_half(second_half_name_recycle_1, card_1[3], card_1[4])
-        put_board_card(recycle_card_type_1, card_1[1], card_1[2], card_1[3], card_1[4])
+        put_board_card(recycle_card_num_1, card_1[1], card_1[2], card_1[3], card_1[4])
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.setdefault("e_counter", e_counter)
 
@@ -1085,7 +1086,6 @@ while step_counter <= 60:
             card_to_recycle = recycle_and_cmd[0]
 
             recycle_card(card_to_recycle[1], card_to_recycle[2], card_to_recycle[3], card_to_recycle[4])
-
 
             cmd = recycle_and_cmd[1]
 
