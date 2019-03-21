@@ -967,13 +967,13 @@ recent_column = 100
 toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
-recycle_step = 10
+recycle_step = 4
 isFileGenEnabled = False
 file_name = 'minmaxtrace1.txt'
 
 file = input("Do you want to print trace file? (y/n)")
 try:
-    if file == 'y' or file =='n':
+    if file == 'y':
         isFileGenEnabled = True
 except Exception:
     isFileGenEnabled = False
