@@ -101,6 +101,8 @@ def place_half(role, type_str, row_num, column_num):
     board_visual[12 - row_num][column_num] = type_str
     if check_if_win(role, type_str, row_num, column_num):
         print_board()
+        print(str(role) + "win the game by placing " + str(type_str) + " on row = " + str(row_num) + " col = " + str(
+            column_num))
         sys.exit([0])
 
 
@@ -952,7 +954,7 @@ recent_column = 100
 toked_row = 100
 toked_column = 100
 # recycle_id = board_card[12 - recycle_row][recycle_column]
-recycle_step = 10
+recycle_step = 4
 isFileGenEnabled = False
 file_name = 'minmaxtrace1.txt'
 
@@ -963,8 +965,7 @@ try:
 except Exception:
     isFileGenEnabled = False
 
-print("AI is deciding it plays the as 1st Player or 2nd Player:....")
-ai_player_num = random.randint(1, 2)
+ai_player_num = int(input("AI is playing as (1 -> 1st Player, 2 -> 2nd Player)"))
 human_player_num = 0
 if ai_player_num == 1:
     human_player_num = 2
@@ -976,36 +977,21 @@ human_player_num = str(human_player_num)
 print("AI chooses to be Player " + ai_player_num)
 print('Human is Player ' + human_player_num)
 
-ai_player_role = ''
+ai_player_role = input("AI will play (c for color, d for dot?")
 human_player_role = ''
-if ai_player_num == "1":
-    print("AI is deciding which role to play (color or dot):......")
-    i = random.randint(1, 2)
-    if i == 1:
-        ai_player_role = 'color'
-        human_player_role = 'dot'
-        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_role)
-    else:
-        ai_player_role = 'dot'
-        human_player_role = 'color'
-        print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_role)
+if ai_player_role == 'c':
+    ai_player_role = 'color'
+    human_player_role = 'dot'
+    print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_role)
 else:
-    role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
-    while not is_color_dot_valid(role_select):
-        print("Your input is invalid, please input again:")
-        role_select = input("Player1: Please choose a role to play (c for color and d for dot):")
-    if role_select == 'c':
-        ai_player_role = 'dot'
-        human_player_role = 'color'
-        print('Player1 plays ' + human_player_role + " Player2 plays " + ai_player_role)
-    else:
-        ai_player_role = 'color'
-        human_player_role = 'dot'
-        print('Player1 plays ' + human_player_role + " Player2 plays " + ai_player_role)
+    ai_player_role = 'dot'
+    human_player_role = 'color'
+    print('Player1 plays ' + ai_player_role + " Player2 plays " + human_player_role)
+
 
 print_board()
 
-while step_counter <= 60:
+while step_counter <= 39:
     while card_id <= recycle_step:
         playerId = toggle_player(playerId)
 
@@ -1046,11 +1032,12 @@ while step_counter <= 60:
 
         dict_card_type[card_num] = card_type
 
+        print("Last Card with " + str(card_type) + " placed on col = " + str(column1) + " row = " + str(row1))
         place_half(role, half_name1, row1, column1)
         place_half(role, half_name2, row2, column2)
         recent_row = row1
         recent_column = column1
-        print("Last Card placed on col = " + str(recent_column) + " row = " + str(recent_row))
+
 
         put_board_card(card_num, row1, column1, row2, column2)
         print_board_card()
@@ -1137,6 +1124,8 @@ while step_counter <= 60:
         half_name1 = first_half_name(card_type)
         half_name2 = second_half_name(card_type)
 
+        print(
+            "Last Card with " + str(card_type) + " placed on col = " + str(column1) + " row = " + str(row1))
         place_half(role, half_name1, row1, column1)
         place_half(role, half_name2, row2, column2)
         put_board_card(recycle_card_id, row1, column1, row2, column2)
@@ -1148,3 +1137,4 @@ while step_counter <= 60:
 
         print_board_card()
         print_board()
+        step_counter = step_counter + 1
