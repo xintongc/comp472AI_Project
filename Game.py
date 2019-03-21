@@ -15,6 +15,7 @@ board_visual = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
                 ['01', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
                 ['  ', 'A ', 'B ', 'C ', 'D ', 'E ', 'F ', 'G ', 'H ']]
 
+
 board_card = [['12', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
               ['11', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
               ['10', '  ', '  ', '  ', '  ', '  ', '  ', '  ', '  '],
@@ -562,8 +563,8 @@ def run_min_max(role):
             if final_max_value < min_value:
                 final_max_value = min_value
                 final_cmd = cmd_1
-                print("--------------------------------Level1------MAX--------------@" + str(final_max_value) + cmd_1)
-                print("Level1--MAX------------------@" + str(e) + " " + cmd_1)
+                # print("--------------------------------Level1------MAX--------------@" + str(final_max_value) + cmd_1)
+                # print("Level1--MAX------------------@" + str(e) + " " + cmd_1)
     minmax_trace.get('level1').append(final_max_value)
     minmax_trace.setdefault("e_counter", e_counter)
 
@@ -675,14 +676,19 @@ def evaluate(role_select, cmd): #board has two additional card, try to place the
     row2 = second_half_row(card_type, row1)
     column1 = inputList[1]
     column2 = second_half_column(card_type, column1)
+    half_name1 = first_half_name(card_type)
+    half_name2 = second_half_name(card_type)
 
-    factor_one = 1
-    factor_two = 5
-    factor_three = 80
-    factor_four = 100
+    place_temp_half(half_name1, row1, column1)
+    place_temp_half(half_name2, row2, column2)
+
+    factor_one = 5
+    factor_two = 20
+    factor_three = 100
+    factor_four = 10000
     factor_half1 = 10
-    factor_half2 = 1
-    factor_empty_cell = 2
+    factor_half2 = 3
+    factor_empty_cell = 3
 
     en_r = 0
     en_x = 0
@@ -728,57 +734,60 @@ def evaluate(role_select, cmd): #board has two additional card, try to place the
         depth_arr_o = depth('O', row2, column2)
         empty_o = empty_cell('O', row2, column2, depth_arr_o) * factor_empty_cell
 
-    score_r = [depth_arr_r[0] + depth_arr_r[1], depth_arr_r[2] + depth_arr_r[3], depth_arr_r[4] + depth_arr_r[5],
-               depth_arr_r[6] + depth_arr_r[7]]
-    score_d = [depth_arr_d[0] + depth_arr_d[1], depth_arr_d[2] + depth_arr_d[3], depth_arr_d[4] + depth_arr_d[5],
-               depth_arr_d[6] + depth_arr_d[7]]
-    score_w = [depth_arr_w[0] + depth_arr_w[1], depth_arr_w[2] + depth_arr_w[3], depth_arr_w[4] + depth_arr_w[5],
-               depth_arr_w[6] + depth_arr_w[7]]
-    score_o = [depth_arr_o[0] + depth_arr_o[1], depth_arr_o[2] + depth_arr_o[3], depth_arr_o[4] + depth_arr_o[5],
-               depth_arr_o[6] + depth_arr_o[7]]
+    score_r = [depth_arr_r[0] + depth_arr_r[1] * 1.3, depth_arr_r[2] + depth_arr_r[3], depth_arr_r[4] * 1.3
+               + depth_arr_r[5] * 1.3, depth_arr_r[6] + depth_arr_r[7]]
+    score_d = [depth_arr_d[0] + depth_arr_d[1] * 1.3, depth_arr_d[2] + depth_arr_d[3], depth_arr_d[4] * 1.3
+               + depth_arr_d[5] * 1.3, depth_arr_d[6] + depth_arr_d[7]]
+    score_w = [depth_arr_w[0] + depth_arr_w[1] * 1.3, depth_arr_w[2] + depth_arr_w[3], depth_arr_w[4] * 1.3
+               + depth_arr_w[5] * 1.3, depth_arr_w[6] + depth_arr_w[7]]
+    score_o = [depth_arr_o[0] + depth_arr_o[1] * 1.3, depth_arr_o[2] + depth_arr_o[3], depth_arr_o[4] * 1.3
+               + depth_arr_o[5] * 1.3, depth_arr_o[6] + depth_arr_o[7]]
+
+    # [t, b, tr, bl, r, l, rb, lt]
 
     for score in score_r:
-        if score == 1:
-            en_r += factor_one
-        if score == 2:
-            en_r += factor_two
-        if score == 3:
-            en_r += factor_three
-        if score == 4:
-            en_r += factor_four * factor_four
+        if score < 2:
+            en_r += factor_one * score
+        elif score < 3:
+            en_r += factor_two * score
+        elif score < 4:
+            en_r += factor_three * score
+        elif score < 5:
+            en_r += factor_four * score
             break
 
     for score in score_d:
-        if score == 1:
-            en_x += factor_one
-        if score == 2:
-            en_x += factor_two
-        if score == 3:
-            en_x += factor_three
-        if score == 4:
-            en_x += factor_four * factor_four
+        if score < 2:
+            en_x += factor_one * score
+        elif score < 3:
+            en_x += factor_two * score
+        elif score < 4:
+            en_x += factor_three * score
+        elif score < 5:
+            en_x += factor_four * score
+
             break
 
     for score in score_w:
-        if score == 1:
-            en_w += factor_one
-        if score == 2:
-            en_w += factor_two
-        if score == 3:
-            en_w += factor_three
-        if score == 4:
-            en_w += factor_four * factor_four
+        if score < 2:
+            en_w += factor_one * score
+        elif score < 3:
+            en_w += factor_two * score
+        elif score < 4:
+            en_w += factor_three * score
+        elif score < 5:
+            en_w += factor_four * score
             break
 
     for score in score_o:
-        if score == 1:
-            en_o += factor_one
-        if score == 2:
-            en_o += factor_two
-        if score == 3:
-            en_o += factor_three
-        if score == 4:
-            en_o += factor_four * factor_four
+        if score < 2:
+            en_o += factor_one * score
+        elif score < 3:
+            en_o += factor_two * score
+        elif score < 4:
+            en_o += factor_three * score
+        elif score < 5:
+            en_o += factor_four * score
             break
 
     if card_type == 1 or card_type == 4:
@@ -797,16 +806,12 @@ def evaluate(role_select, cmd): #board has two additional card, try to place the
         en_color = (en_w + empty_w) * factor_half1 + (en_o + empty_o) * factor_half2
         en_dot = (en_x + empty_d) * factor_half1 + (en_r + empty_r) * factor_half2
 
+    remove_temp_card(row1, column1, row2, column2)
+
     if role_select == "color":
-        if en_dot >= 800:
-            return -20000
-        else:
-            return en_color - en_dot
+        return en_color - en_dot
     else:
-        if en_color >= 800:
-            return -20000
-        else:
-            return en_dot - en_color
+        return en_dot - en_color
 
 
 def depth(role_token, row, column):
@@ -959,6 +964,8 @@ print('Human is Player ' + human_player_num)
 
 ai_player_role = ''
 human_player_role = ''
+
+
 if ai_player_num == "1":
     print("AI is deciding which role to play (color or dot):......")
     i = random.randint(1, 2)
@@ -985,6 +992,7 @@ else:
         print('Player1 plays ' + human_player_role + " Player2 plays " + ai_player_role)
 
 print_board()
+
 
 while step_counter <= 60:
     while card_id <= recycle_step:
@@ -1130,3 +1138,14 @@ while step_counter <= 60:
         put_board_card(recycle_card_id, row1, column1, row2, column2)
         print_board_card()
         print_board()
+
+# e1 = evaluate("color", "1 C 2")
+# print(e1)
+# e2 = evaluate("dot", "1 C 2")
+# print(e2)
+# e3 = evaluate("color", "5 C 2")
+# print(e3)
+# e4 = evaluate("dot", "5 C 2")
+# print(e4)
+
+# print_board()
