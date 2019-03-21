@@ -1001,8 +1001,8 @@ else:
 print_board()
 
 while step_counter <= 39:
-    print("This is the step: " + str(step_counter))
     while card_id <= recycle_step:
+        print("This is the step: " + str(step_counter))
         playerId = toggle_player(playerId)
 
         print_card_type()
@@ -1054,6 +1054,7 @@ while step_counter <= 39:
         print_board()
         step_counter = step_counter + 1
     while card_id > recycle_step:
+        print("This is the step: " + str(step_counter))
         playerId = toggle_player(playerId)
 
         print_card_type()
